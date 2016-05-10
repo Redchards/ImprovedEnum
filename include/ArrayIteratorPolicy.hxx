@@ -2,6 +2,8 @@
 #define ARRAY_ITERATOR_POLICY_HXX
 
 //#include <ConstexprAssert.hxx>
+#include <cstddef>
+
 #include <Platform.hxx>
 
 /* Define an helper class to ease defining array style class iterators.

@@ -1,6 +1,7 @@
 #ifndef CONSTEXPR_ASSERT_HXX
 #define CONSTEXPR_ASSERT_HXX
 
+#include <cassert>
 #include <cstdlib>
 #include <cstdio>
 
