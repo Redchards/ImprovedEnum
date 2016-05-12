@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include <ConstString.hxx>
+//#include <ConstString.hxx>
 #include <Platform.hxx>
 
 /* Little trick inspired by Eric Niebler's blog post :
@@ -20,8 +20,8 @@
 
 #define CONSTEXPR_ASSERT(condition, msg) condition ? \
 										 int{} : \
-										 throw Details::ConstexprAssertFailure([](ConstString assertMsg){ \
-										     std::fprintf(stderr, "Assertion failure: %s\n", static_cast<const char*>(assertMsg)); assert(!#condition); \
+										 throw Details::ConstexprAssertFailure([](const char* assertMsg){ \
+										     std::fprintf(stderr, "Assertion failure: %s\n", assertMsg); assert(!#condition); \
 										 }, msg)
 
 namespace Details
@@ -31,7 +31,7 @@ class ConstexprAssertFailure
 {
 	public:
 	template<class Fn>
-	constexpr ConstexprAssertFailure(Fn&& fn, ConstString msg)
+	constexpr ConstexprAssertFailure(Fn&& fn, const char* msg)
 	{
 		fn(msg);
 		std::quick_exit(EXIT_FAILURE);

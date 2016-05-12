@@ -16,11 +16,7 @@
 // "is_in_list", and a typelist.
 
 namespace Details
-{
-    template<class>
-    struct IsLinearEnum : std::false_type
-    {};
-    
+{   
     template<class T>
     class AssignmentRemover
     {
@@ -110,8 +106,6 @@ enum class EnumIteratorTag : uint8_t
     Reversed
 };
 
-
-// TODO : Add += to ArrayIteratorPolicy classes, and add = operator to this one.
 template<class EnumName, EnumIteratorTag tag>
 class EnumIterator : public std::conditional_t<tag == EnumIteratorTag::Normal,
                                                 typename ArrayIteratorPolicy<typename EnumName::ValuesArrayType>::const_iterator,

@@ -3,6 +3,8 @@
 
 #include <ArrayIteratorPolicy.hxx>
 #include <ConstexprAssert.hxx>
+#include <ConstString.hxx>
+#include <Range.hxx>
 #include <StringDetails.hxx>
 
 // TODO : Allow range of different StaticString<size> (right know, only the same Tsize is allowed)
