@@ -7,7 +7,7 @@
 #include <mettle/header_only.hpp>
 using namespace mettle;
 
-#include <EnumUtils.hxx>
+#include <ImprovedEnum.hxx>
 
 ITERATABLE_ENUM(IteratableEnumTst1, size_t,
 	Test1,
