@@ -4,9 +4,9 @@ A small header-only utility library to allow iteratable and serialiazable enum i
 #Features
 Improved enumerations comes in two flavor : iteratable enums, and stringizable enums.
 
-Iteratable enums are simple enums with added iteration capability. Thus, iteration from an element of the enum or in a range-based loop is supported. One can also retrieve the enum name using the 'getEnumName()' static method, and the size via the 'size()' static method.
+Iteratable enums are simple enums with added iteration capability. Thus, iteration from an element of the enum or in a range-based loop is supported. One can also retrieve the enum name using the ```getEnumName()``` static method, and the size via the ```size()``` static method.
 
-Stringizable enums do have the same capabilities as the aftermentionned iteratable enums, with the added possibility to retrieve the name of an element of the enum using the 'toString()' method.
+Stringizable enums do have the same capabilities as the aftermentionned iteratable enums, with the added possibility to retrieve the name of an element of the enum using the ```toString()``` method.
 
 In addition, all data generation and computation is done at compile time, no more work is needed at runtime. This is thus an almost cost-free abstraction.
 
@@ -20,8 +20,8 @@ The tests will then be found under the bin/$(platform)/$(configuration)/test fol
 The testing framework used is [mettle](https://github.com/jimporter/mettle), a nice little unit testing framework using C++14.
 
 Writing code using this library is pretty straightforward. First of all, choose one of the two macro used to generate enumerations :
-ITERATABLE_ENUM(EnumName, underlyingType, ...)
-IMPROVED_ENUM(EnumName, underlyingType, ...)
+```ITERATABLE_ENUM(EnumName, underlyingType, ...)
+IMPROVED_ENUM(EnumName, underlyingType, ...)```
 
 Be aware that, while it can be more convenient, the IMPROVED_ENUM macro may take a slighty longer time to generate, due to the fact that it need to generate names in addition to all the other code to take care about iteration and such. The difference should be in many case, however, negligible. In the following examples, we will use IMPROVED_ENUM, but the declaration of the enum using ITERATABLE_ENUM is strictly the same.
 
@@ -42,6 +42,17 @@ IMPROVED_ENUM(MyEnum, size_t,
 	FooBar // Will have the value 7, like in a normal enumeration
 );
 ```
+
+Then, access to elements of the enum is trivial :
+```C++
+MyEnum val = MyEnm::Foo;
+std::cout << val.toUnderlying() << std::endl; // Output : 0
+
+val = MyEnum::FooBar;
+std::cout << val.toUnderlying() << std::endl; // Output : 7
+```
+
+Iteration comes also in multiple fashion, using range based loop, or construction using ```from()``` method or constructing iterator from enumeration value :
 
 #Similar projects
 There is few similar projects around the internet, and more specificaly this one :

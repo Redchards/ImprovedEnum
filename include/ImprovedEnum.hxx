@@ -274,7 +274,8 @@ class EnumName                                                                  
         return size_;                                                                                                           \
     }                                                                                                                           \
                                                                                                                                 \
-    private:                                                                                                                    \
+    private:  
+    // TODO : Add 'iterableFrom' method for better range-based loop                                                                                                                  \
     class IteratableHelper                                                                                                      \
     {                                                                                                                           \
         public:                                                                                                                 \
