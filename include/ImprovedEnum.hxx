@@ -188,20 +188,20 @@ class EnumName                                                                  
     class IteratableHelper                                                                                                      \
     {                                                                                                                           \
         public:                                                                                                                 \
-        static constexpr EnumName::iterator begin() noexcept { return { 0, EnumName::iterator::indexInitFlag{} }; }                                                  \
+        static constexpr EnumName::iterator begin() noexcept { return { 0, EnumName::iterator::indexInitFlag{} }; }             \
         static constexpr EnumName::const_iterator cbegin() noexcept { return begin(); }                                         \
-        static constexpr EnumName::iterator end() noexcept { return { EnumName::size(), EnumName::iterator::indexInitFlag{} }; }                                     \
-        static constexpr EnumName::const_iterator cend() noexcept { return end(); }                              \
+        static constexpr EnumName::iterator end() noexcept { return { EnumName::size(), EnumName::iterator::indexInitFlag{} }; }\
+        static constexpr EnumName::const_iterator cend() noexcept { return end(); }                                             \
                                                                                                                                 \
         static constexpr EnumName::reverse_iterator rbegin() noexcept { return end(); }                                         \
         static constexpr EnumName::const_reverse_iterator crbegin() noexcept { return end(); }                                  \
         static constexpr EnumName::reverse_iterator rend() noexcept { return begin(); }                                         \
         static constexpr EnumName::const_reverse_iterator crend() noexcept { return begin(); }                                  \
                                                                                                                                 \
-        static constexpr EnumName::iterator from(EnumName e) noexcept { return { e }; }                              \
-        static constexpr EnumName::const_iterator cfrom(EnumName e) noexcept { return { e }; }                       \
-        static constexpr EnumName::reverse_iterator rfrom(EnumName e) noexcept { return { e }; }                     \
-        static constexpr EnumName::const_reverse_iterator crfrom(EnumName e) noexcept { return { e }; }              \
+        static constexpr EnumName::iterator from(EnumName e) noexcept { return { e }; }                                         \
+        static constexpr EnumName::const_iterator cfrom(EnumName e) noexcept { return { e }; }                                  \
+        static constexpr EnumName::reverse_iterator rfrom(EnumName e) noexcept { return { e }; }                                \
+        static constexpr EnumName::const_reverse_iterator crfrom(EnumName e) noexcept { return { e }; }                         \
     };                                                                                                                          \
                                                                                                                                 \
     public:                                                                                                                     \
@@ -274,25 +274,25 @@ class EnumName                                                                  
         return size_;                                                                                                           \
     }                                                                                                                           \
                                                                                                                                 \
-    private:  
-    // TODO : Add 'iterableFrom' method for better range-based loop                                                                                                                  \
+    private:                                                                                                                    \
+    /* TODO : Add 'iterableFrom' method for better range-based loop  */                                                         \
     class IteratableHelper                                                                                                      \
     {                                                                                                                           \
         public:                                                                                                                 \
-        static constexpr EnumName::iterator begin() noexcept { return { 0, EnumName::iterator::indexInitFlag{} }; }                                                  \
+        static constexpr EnumName::iterator begin() noexcept { return { 0, EnumName::iterator::indexInitFlag{} }; }             \
         static constexpr EnumName::const_iterator cbegin() noexcept { return begin(); }                                         \
-        static constexpr EnumName::iterator end() noexcept { return { size_, EnumName::iterator::indexInitFlag{} }; }                                                \
-        static constexpr EnumName::const_iterator cend() noexcept { return end(); }                                          \
+        static constexpr EnumName::iterator end() noexcept { return { size_, EnumName::iterator::indexInitFlag{} }; }           \
+        static constexpr EnumName::const_iterator cend() noexcept { return end(); }                                             \
                                                                                                                                 \
         static constexpr EnumName::reverse_iterator rbegin() noexcept { return end(); }                                         \
         static constexpr EnumName::const_reverse_iterator crbegin() noexcept { return end(); }                                  \
         static constexpr EnumName::reverse_iterator rend() noexcept { return begin(); }                                         \
         static constexpr EnumName::const_reverse_iterator crend() noexcept { return begin(); }                                  \
                                                                                                                                 \
-        static constexpr EnumName::iterator from(EnumName e) noexcept { return { e }; }                              \
-        static constexpr EnumName::const_iterator cfrom(EnumName e) noexcept { return { e }; }                       \
-        static constexpr EnumName::reverse_iterator rfrom(EnumName e) noexcept { return { e }; }                     \
-        static constexpr EnumName::const_reverse_iterator crfrom(EnumName e) noexcept { return { e }; }              \
+        static constexpr EnumName::iterator from(EnumName e) noexcept { return { e }; }                                         \
+        static constexpr EnumName::const_iterator cfrom(EnumName e) noexcept { return { e }; }                                  \
+        static constexpr EnumName::reverse_iterator rfrom(EnumName e) noexcept { return { e }; }                                \
+        static constexpr EnumName::const_reverse_iterator crfrom(EnumName e) noexcept { return { e }; }                         \
     };                                                                                                                          \
                                                                                                                                 \
     public:                                                                                                                     \

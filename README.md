@@ -52,7 +52,35 @@ val = MyEnum::FooBar;
 std::cout << val.toUnderlying() << std::endl; // Output : 7
 ```
 
-Iteration comes also in multiple fashion, using range based loop, or construction using ```from()``` method or constructing iterator from enumeration value :
+Iteration comes also in multiple fashion, using range based loop, or construction using ```from()``` method or constructing iterator from enumeration value.
+```C++
+std::cout << "Now displaying every value inside the enumeration " << MyEnum::getEnumName() << " using range based loop." << std::endl;
+for(auto val : MyEnum::iterable())
+{
+	std::cout << val << std::endl;
+}
+
+std::cout << "Using iterable now." << std::endl;
+for(auto it = MyEnum::iterable().begin(); it != MyEnum::iterable().end(); ++it)
+{
+	std::cout << *it << std::endl;
+}
+
+std::cout << "From MyEnum::Bar." << std::endl;
+for(auto it = MyEnum::iterator{MyEnum::Bar}; auto it != MyEnum::iterable().end(); ++it)
+{
+	std::cout << *it << std::endl;
+}
+```
+
+Last but not the least, we have the stringification of the enumeration values, like this :
+```C++
+MyEnum val = MyEnum::Bar;
+std::cout << val.toString() << std::endl; // Output : Bar
+
+val = MyEnum::FooBar;
+std::cout << val.toString() << std::endl; // Output : FooBar
+```
 
 #Similar projects
 There is few similar projects around the internet, and more specificaly this one :
