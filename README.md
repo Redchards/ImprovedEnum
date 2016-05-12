@@ -1,2 +1,50 @@
 #ImprovedEnum
-A small header-only utility library to allow iteratable and serialiazable enum in C++14.
+A small header-only utility library to allow iteratable and serialiazable enum in C++14. The goal of this library is to provide features yet lacking in standard C++ in order to make enum more useful. This was also a pretty good occasion to test C++ relaxed constexpr capabilities, which are pretty amazing.
+
+#Features
+Improved enumerations comes in two flavor : iteratable enums, and stringizable enums.
+
+Iteratable enums are simple enums with added iteration capability. Thus, iteration from an element of the enum or in a range-based loop is supported. One can also retrieve the enum name using the 'getEnumName()' static method, and the size via the 'size()' static method.
+
+Stringizable enums do have the same capabilities as the aftermentionned iteratable enums, with the added possibility to retrieve the name of an element of the enum using the 'toString()' method.
+
+In addition, all data generation and computation is done at compile time, no more work is needed at runtime. This is thus an almost cost-free abstraction.
+
+#How to use
+The code is header only, so dropping includes files into your project and including "ImprovedEnum.hxx" should do the trick. It is also possible to compile tests using :
+
+```make test```
+
+The tests will then be found under the bin/$(platform)/$(configuration)/test folder. 
+
+The testing framework used is [mettle](https://github.com/jimporter/mettle), a nice little unit testing framework using C++14.
+
+Writing code using this library is pretty straightforward. First of all, choose one of the two macro used to generate enumerations :
+ITERATABLE_ENUM(EnumName, underlyingType, ...)
+IMPROVED_ENUM(EnumName, underlyingType, ...)
+
+Be aware that, while it can be more convenient, the IMPROVED_ENUM macro may take a slighty longer time to generate, due to the fact that it need to generate names in addition to all the other code to take care about iteration and such. The difference should be in many case, however, negligible. In the following examples, we will use IMPROVED_ENUM, but the declaration of the enum using ITERATABLE_ENUM is strictly the same.
+
+Here is how to declare anu enumeration :
+```C++
+IMPROVED_ENUM(MyEnum, size_t,
+	Foo,
+	Bar,
+	FooBar
+);
+```
+
+This kind of declaration also supports initializers like normal enumerations. For example, this is a valid declaration :
+```C++
+IMPROVED_ENUM(MyEnum, size_t,
+	Foo,
+	Bar=6,
+	FooBar // Will have the value 7, like in a normal enumeration
+);
+```
+
+#Similar projects
+There is few similar projects around the internet, and more specificaly this one :
+https://github.com/aantron/better-enums
+
+Admittedly, this other project is far more mature, has some additional features that this project does not have, and is compatible with C++98, when this project requires a modern C++14 compiler. However, the iteration on the enum is less convenient, which was the initial goal of this project. Still, always nice to be aware of alternatives !
