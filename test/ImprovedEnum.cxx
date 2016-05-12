@@ -9,7 +9,7 @@ using namespace mettle;
 
 #include <ImprovedEnum.hxx>
 
-ITERATABLE_ENUM(IteratableEnumTst1, size_t,
+iterable_ENUM(iterableEnumTst1, size_t,
 	Test1,
 	Test2,
 	Test3,
@@ -17,7 +17,7 @@ ITERATABLE_ENUM(IteratableEnumTst1, size_t,
 	Test5
 );
 
-ITERATABLE_ENUM(IteratableEnumTst2, size_t,
+iterable_ENUM(iterableEnumTst2, size_t,
 	Test1,
 	Test2,
 	Test3,
@@ -30,7 +30,7 @@ ITERATABLE_ENUM(IteratableEnumTst2, size_t,
 	Test10
 );
 
-ITERATABLE_ENUM(IteratableEnumTst3, size_t,
+iterable_ENUM(iterableEnumTst3, size_t,
 	Test1,
 	Test2 = 9,
 	Test3 = 12,
@@ -67,11 +67,11 @@ IMPROVED_ENUM(ImprovedEnumTst3, size_t,
 	Test5
 );
 
-using iteratableEnumTestList = 
+using iterableEnumTestList = 
 	std::tuple<
-		IteratableEnumTst1,
-		IteratableEnumTst2,
-		IteratableEnumTst3
+		iterableEnumTst1,
+		iterableEnumTst2,
+		iterableEnumTst3
 	>;
 	
 using improvedEnumTestList = 
@@ -88,7 +88,7 @@ struct enumFixture
 };
 
 template<class EnumName>
-auto iteratableEnumTestCode()
+auto iterableEnumTestCode()
 {
 	return [](auto &_) {
 		_.setup([](enumFixture<EnumName>& fixture) {
@@ -97,7 +97,7 @@ auto iteratableEnumTestCode()
 		
 		_.test("Iteration test", [](enumFixture<EnumName>& fixture) {
 			size_t i = 0;
-			for(auto value : EnumName::iteratable())
+			for(auto value : EnumName::iterable())
 			{
 				expect(value.toUnderlying(), equal_to(fixture.values[i]));
 				++i;
@@ -131,7 +131,7 @@ auto iteratableEnumTestCode()
 		
 		_.test("Iteration from first element with 'from()' method", [](enumFixture<EnumName>& fixture) {
 			size_t i = 0;
-			for(auto it = EnumName::iteratable().from(EnumName::Test1); it != EnumName::iteratable().end(); ++it)
+			for(auto it = EnumName::iterable().from(EnumName::Test1); it != EnumName::iterable().end(); ++it)
 			{
 				expect(it->toUnderlying(), equal_to(fixture.values[i]));
 				++i;
@@ -140,7 +140,7 @@ auto iteratableEnumTestCode()
 		
 		_.test("Iteration from second element with 'from()' method", [](enumFixture<EnumName>& fixture) {
 			size_t i = 1;
-			for(auto it = EnumName::iteratable().from(EnumName::Test2); it != EnumName::iteratable().end(); ++it)
+			for(auto it = EnumName::iterable().from(EnumName::Test2); it != EnumName::iterable().end(); ++it)
 			{
 				expect(it->toUnderlying(), equal_to(fixture.values[i]));
 				++i;
@@ -149,7 +149,7 @@ auto iteratableEnumTestCode()
 		
 		_.test("Iteration from third element with 'from()' method", [](enumFixture<EnumName>& fixture) {
 			size_t i = 2;
-			for(auto it = EnumName::iteratable().from(EnumName::Test3); it != EnumName::iteratable().end(); ++it)
+			for(auto it = EnumName::iterable().from(EnumName::Test3); it != EnumName::iterable().end(); ++it)
 			{
 				expect(it->toUnderlying(), equal_to(fixture.values[i]));
 				++i;
@@ -158,7 +158,7 @@ auto iteratableEnumTestCode()
 		
 		_.test("Iteration from fourth element with 'from()' method", [](enumFixture<EnumName>& fixture) {
 			size_t i = 3;
-			for(auto it = EnumName::iteratable().from(EnumName::Test4); it != EnumName::iteratable().end(); ++it)
+			for(auto it = EnumName::iterable().from(EnumName::Test4); it != EnumName::iterable().end(); ++it)
 			{
 				expect(it->toUnderlying(), equal_to(fixture.values[i]));
 				++i;
@@ -167,7 +167,7 @@ auto iteratableEnumTestCode()
 		
 		_.test("Iteration from fifth element with 'from()' method", [](enumFixture<EnumName>& fixture) {
 			size_t i = 4;
-			for(auto it = EnumName::iteratable().from(EnumName::Test5); it != EnumName::iteratable().end(); ++it)
+			for(auto it = EnumName::iterable().from(EnumName::Test5); it != EnumName::iterable().end(); ++it)
 			{
 				expect(it->toUnderlying(), equal_to(fixture.values[i]));
 				++i;
@@ -176,7 +176,7 @@ auto iteratableEnumTestCode()
 		
 		_.test("Iteration from first element with iterator", [](enumFixture<EnumName>& fixture) {
 			size_t i = 0;
-			for(auto it = typename EnumName::iterator(EnumName::Test1); it != EnumName::iteratable().end(); ++it)
+			for(auto it = typename EnumName::iterator(EnumName::Test1); it != EnumName::iterable().end(); ++it)
 			{
 				expect(it->toUnderlying(), equal_to(fixture.values[i]));
 				++i;
@@ -185,7 +185,7 @@ auto iteratableEnumTestCode()
 		
 		_.test("Iteration from second element with iterator", [](enumFixture<EnumName>& fixture) {
 			size_t i = 1;
-			for(auto it = typename EnumName::iterator(EnumName::Test2); it != EnumName::iteratable().end(); ++it)
+			for(auto it = typename EnumName::iterator(EnumName::Test2); it != EnumName::iterable().end(); ++it)
 			{
 				expect(it->toUnderlying(), equal_to(fixture.values[i]));
 				++i;
@@ -194,7 +194,7 @@ auto iteratableEnumTestCode()
 		
 		_.test("Iteration from third element with iterator", [](enumFixture<EnumName>& fixture) {
 			size_t i = 2;
-			for(auto it = typename EnumName::iterator(EnumName::Test3); it != EnumName::iteratable().end(); ++it)
+			for(auto it = typename EnumName::iterator(EnumName::Test3); it != EnumName::iterable().end(); ++it)
 			{
 				expect(it->toUnderlying(), equal_to(fixture.values[i]));
 				++i;
@@ -203,7 +203,7 @@ auto iteratableEnumTestCode()
 		
 		_.test("Iteration from fourth element with iterator", [](enumFixture<EnumName>& fixture) {
 			size_t i = 3;
-			for(auto it = typename EnumName::iterator(EnumName::Test4); it != EnumName::iteratable().end(); ++it)
+			for(auto it = typename EnumName::iterator(EnumName::Test4); it != EnumName::iterable().end(); ++it)
 			{
 				expect(it->toUnderlying(), equal_to(fixture.values[i]));
 				++i;
@@ -212,7 +212,7 @@ auto iteratableEnumTestCode()
 		
 		_.test("Iteration from fifth element with iterator", [](enumFixture<EnumName>& fixture) {
 			size_t i = 4;
-			for(auto it = typename EnumName::iterator(EnumName::Test5); it != EnumName::iteratable().end(); ++it)
+			for(auto it = typename EnumName::iterator(EnumName::Test5); it != EnumName::iterable().end(); ++it)
 			{
 				expect(it->toUnderlying(), equal_to(fixture.values[i]));
 				++i;
@@ -221,7 +221,7 @@ auto iteratableEnumTestCode()
 		
 		_.test("Reverse iteration", [](enumFixture<EnumName>& fixture) {
 			size_t i = EnumName::size() - 1;
-			for(auto it = EnumName::iteratable().rbegin(); it != EnumName::iteratable().rend(); ++it)
+			for(auto it = EnumName::iterable().rbegin(); it != EnumName::iterable().rend(); ++it)
 			{
 				expect(it->toUnderlying(), equal_to(fixture.values[i]));
 				--i;
@@ -240,7 +240,7 @@ auto improvedEnumTestCode()
 		
 		_.test("Conversion of each enum value to string", [](enumFixture<EnumName>&){
 			size_t i = 1;
-			for(auto value : EnumName::iteratable())
+			for(auto value : EnumName::iterable())
 			{
 				expect(value.toString(), equal_to(std::string{"Test"} + std::to_string(i)));
 				++i;
@@ -249,7 +249,7 @@ auto improvedEnumTestCode()
 		
 		_.test("Iteration 2 by 2 retrieve string value", [](enumFixture<EnumName>&){
 			size_t i = 1;
-			for(auto it = EnumName::iteratable().begin(); it < EnumName::iteratable().end(); it += 2)
+			for(auto it = EnumName::iterable().begin(); it < EnumName::iterable().end(); it += 2)
 			{
 				expect(it->toString(), equal_to(std::string{"Test"} + std::to_string(i)));
 				i += 2;
@@ -260,26 +260,26 @@ auto improvedEnumTestCode()
 
 
 
-template<class IteratableEnumList, class ImprovedEnumList>
+template<class iterableEnumList, class ImprovedEnumList>
 class EnumTestRunner
 {
 	public:
 	EnumTestRunner()
 	{
-		runEachIteratableEnumTest();
+		runEachiterableEnumTest();
 		runEachImprovedEnumTest();
 	}
 	
-	static void runEachIteratableEnumTest()
+	static void runEachiterableEnumTest()
 	{
-		runEachIteratableEnumTestImpl(std::make_integer_sequence<size_t, std::tuple_size<IteratableEnumList>::value>{});
+		runEachiterableEnumTestImpl(std::make_integer_sequence<size_t, std::tuple_size<iterableEnumList>::value>{});
 	}
 	
 	template<size_t ... Indices>
-	static void runEachIteratableEnumTestImpl(std::integer_sequence<size_t, Indices...>)
+	static void runEachiterableEnumTestImpl(std::integer_sequence<size_t, Indices...>)
 	{
-		(void)std::initializer_list<bool>{(suite<enumFixture<std::remove_reference_t<decltype(std::get<Indices>(std::declval<IteratableEnumList>()))>>>
-										 {"Automatic enum test", iteratableEnumTestCode<std::remove_reference_t<decltype(std::get<Indices>(std::declval<IteratableEnumList>()))>>()}, true)...};
+		(void)std::initializer_list<bool>{(suite<enumFixture<std::remove_reference_t<decltype(std::get<Indices>(std::declval<iterableEnumList>()))>>>
+										 {"Automatic enum test", iterableEnumTestCode<std::remove_reference_t<decltype(std::get<Indices>(std::declval<iterableEnumList>()))>>()}, true)...};
 	}
 	
 	static void runEachImprovedEnumTest()
@@ -292,13 +292,13 @@ class EnumTestRunner
 	{
 		(void)std::initializer_list<bool>{
 			(suite<enumFixture<std::remove_reference_t<decltype(std::get<Indices>(std::declval<ImprovedEnumList>()))>>>
-			{"Automatic enum test", iteratableEnumTestCode<std::remove_reference_t<decltype(std::get<Indices>(std::declval<ImprovedEnumList>()))>>()},
+			{"Automatic enum test", iterableEnumTestCode<std::remove_reference_t<decltype(std::get<Indices>(std::declval<ImprovedEnumList>()))>>()},
 			suite<enumFixture<std::remove_reference_t<decltype(std::get<Indices>(std::declval<ImprovedEnumList>()))>>>
 			{"Automatic enum test", improvedEnumTestCode<std::remove_reference_t<decltype(std::get<Indices>(std::declval<ImprovedEnumList>()))>>()}, true)...
 		};
 	}
 };
 
-EnumTestRunner<iteratableEnumTestList, improvedEnumTestList> runner{};
+EnumTestRunner<iterableEnumTestList, improvedEnumTestList> runner{};
 
 #endif // ENUM_UTILS_TEST_HXX

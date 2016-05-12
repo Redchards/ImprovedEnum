@@ -150,7 +150,7 @@ class EnumIterator : public std::conditional_t<tag == EnumIteratorTag::Normal,
 
 }
 
-#define ITERATABLE_ENUM(EnumName, underlyingType, ...)                                                                          \
+#define iterable_ENUM(EnumName, underlyingType, ...)                                                                          \
 static_assert(std::is_integral<underlyingType>::value,                                                                          \
     "The defined underlying type is not an integral type");                                                                     \
 class EnumName                                                                                                                  \
@@ -185,7 +185,7 @@ class EnumName                                                                  
     }                                                                                                                           \
                                                                                                                                 \
     private:                                                                                                                    \
-    class IteratableHelper                                                                                                      \
+    class iterableHelper                                                                                                      \
     {                                                                                                                           \
         public:                                                                                                                 \
         static constexpr EnumName::iterator begin() noexcept { return { 0, EnumName::iterator::indexInitFlag{} }; }             \
@@ -205,7 +205,7 @@ class EnumName                                                                  
     };                                                                                                                          \
                                                                                                                                 \
     public:                                                                                                                     \
-    static constexpr IteratableHelper iteratable() noexcept{ return {}; }                                                       \
+    static constexpr iterableHelper iterable() noexcept{ return {}; }                                                       \
                                                                                                                                 \
     constexpr size_t getIndex() const noexcept                                                                                  \
     {                                                                                                                           \
@@ -276,7 +276,7 @@ class EnumName                                                                  
                                                                                                                                 \
     private:                                                                                                                    \
     /* TODO : Add 'iterableFrom' method for better range-based loop  */                                                         \
-    class IteratableHelper                                                                                                      \
+    class iterableHelper                                                                                                      \
     {                                                                                                                           \
         public:                                                                                                                 \
         static constexpr EnumName::iterator begin() noexcept { return { 0, EnumName::iterator::indexInitFlag{} }; }             \
@@ -296,7 +296,7 @@ class EnumName                                                                  
     };                                                                                                                          \
                                                                                                                                 \
     public:                                                                                                                     \
-    static constexpr IteratableHelper iteratable() noexcept{ return {}; }                                                       \
+    static constexpr iterableHelper iterable() noexcept{ return {}; }                                                       \
                                                                                                                                 \
     constexpr size_t getIndex() const noexcept                                                                                  \
     {                                                                                                                           \
