@@ -5,8 +5,32 @@
 #ifndef RANGE_HXX
 #define RANGE_HXX
 
-template<class ...>
-using void_t = void;
+#include <iterator>
+
+#include <ConstexprAssert.hxx>
+#include <MetaUtils.hxx>
+
+namespace Details
+{
+    template<class Iterator,
+             std::enable_if_t<std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
+                              std::random_access_iterator_tag>::value>* = nullptr>
+    constexpr auto difference(Iterator first, Iterator last)
+    -> typename std::iterator_traits<Iterator>::difference_type
+    {
+        return last - first;
+    }
+    
+    template<class Iterator,
+             std::enable_if_t<!std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
+                              std::random_access_iterator_tag>::value>* = nullptr>
+    constexpr auto difference(Iterator first, Iterator last)
+    -> typename std::iterator_traits<Iterator>::difference_type
+    {
+        typename std::iterator_traits<Iterator>::difference_type i = 0;
+        for(auto it = first; it != last; ++it, ++i);
+        return i;
+    }
 
 template<class T>
 static constexpr bool is_empty_and_trivial = std::is_empty<T>::value && std::is_trivial<T>::value;
@@ -47,14 +71,14 @@ private:
 
 template<class T>
 struct first_pair_attribute<T,
-                            void_t<empty_and_trivial_enabler<T>>
+                            Meta::void_t<empty_and_trivial_enabler<T>>
                            > : public basic_pair_attribute<T>
 {
     static T first;  
 };
 
 template<class T>
-T first_pair_attribute<T, void_t<empty_and_trivial_enabler<T>>>::first{};
+T first_pair_attribute<T, Meta::void_t<empty_and_trivial_enabler<T>>>::first{};
 
 template<class T, class = void>
 struct last_pair_attribute : public basic_pair_attribute<T>
@@ -74,14 +98,14 @@ private:
 
 template<class T>
 struct last_pair_attribute<T,
-                           void_t<empty_and_trivial_enabler<T>>
+                           Meta::void_t<empty_and_trivial_enabler<T>>
                            > : public basic_pair_attribute<T>
 {
     static T last;
 };
 
 template<class T>
-T last_pair_attribute<T, void_t<empty_and_trivial_enabler<T>>>::last{};
+T last_pair_attribute<T, Meta::void_t<empty_and_trivial_enabler<T>>>::last{};
 
 template<class First, class Last>
 struct reduced_pair
@@ -119,38 +143,52 @@ struct reduced_pair
     }
 };
 
+}
+
 template<class Iterator>
-struct range : private reduced_pair<Iterator, Iterator>
+struct range : private Details::reduced_pair<Iterator, Iterator>
 {
     using iterator = Iterator;
-    using base = reduced_pair<Iterator, Iterator>;
+    using base = Details::reduced_pair<Iterator, Iterator>;
     
-    using reduced_pair<Iterator, Iterator>::first;
-    using reduced_pair<Iterator, Iterator>::last;
+    using Details::reduced_pair<Iterator, Iterator>::first;
+    using Details::reduced_pair<Iterator, Iterator>::last;
+    
+    using value_type = typename std::iterator_traits<Iterator>::value_type;
+    using difference_type = typename std::iterator_traits<Iterator>::difference_type;
+    using reference = typename std::iterator_traits<Iterator>::reference;
+    using pointer = typename std::iterator_traits<Iterator>::pointer;
 
     range() = default;
     
-    template<class OtherIterator>
+    template<class OtherIterator,
+             typename = std::enable_if_t<std::is_convertible<OtherIterator, Iterator>::value>>
     constexpr range(OtherIterator first, OtherIterator last)
     : base(std::move(first), std::move(last))
-    {}
+    {
+        CONSTEXPR_ASSERT(Details::difference(begin(), end()), "The begining of the range is past after the end of the range");
+    }
     
     template<class OtherIterator,
              typename = std::enable_if_t<std::is_convertible<OtherIterator, Iterator>::value>>
     constexpr range(range<OtherIterator> rg)
     : range(rg.first, rg.last)
-    {}
+    {
+        CONSTEXPR_ASSERT(Details::difference(begin(), end()), "The begining of the range is past after the end of the range");
+    }
     
     template<class OtherIterator1, class OtherIterator2,
              typename = std::enable_if_t<std::is_convertible<OtherIterator1, Iterator>::value && std::is_convertible<OtherIterator2, Iterator>::value>>
     constexpr range(std::pair<OtherIterator1, OtherIterator2> rg)
     : range(rg.first, rg.last)
-    {}
+    {
+        CONSTEXPR_ASSERT(Details::difference(begin(), end()), "The begining of the range is past after the end of the range");
+    }
     
     // TODO : Only if random access iterator ! Need to handle other cases !!!
     constexpr size_t size() const noexcept
     {
-        return end() - begin();
+        return Details::difference(begin(), end());
     }
     
     constexpr iterator begin() const noexcept
@@ -162,40 +200,6 @@ struct range : private reduced_pair<Iterator, Iterator>
     {
         return last;
     }
-};
-
-using string_range = range<std::string::iterator>;
-using const_string_range = range<std::string::const_iterator>;
-
-class multi_string_range
-{
-    public:
-    using iterator = std::string::iterator;
-    
-    public:
-    template<class Iterator>
-    multi_string_range(Iterator first, Iterator last)
-    : range_vector{{std::move(first), std::move(last)}}
-    {};
-    
-    template<class Iterator,
-             typename = std::enable_if_t<std::is_convertible<Iterator, iterator>::value>>
-    multi_string_range(range<Iterator> rg)
-    : range_vector{{rg.begin(), rg.end()}}
-    {};
-    
-    std::string str() const
-    {
-        std::string tmp;
-        for(auto range : range_vector)
-        {
-            tmp += {range.first, range.last};
-        }
-        return tmp;
-    }
-    
-    private:
-    std::vector<string_range> range_vector;
 };
 
 #endif // RANGE_HXX

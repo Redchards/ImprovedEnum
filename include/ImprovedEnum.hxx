@@ -343,6 +343,7 @@ class EnumName                                                                  
             return e.values[index] == e.value_ ? ConstString{std::get<index>(e.names_)} : Looper<index + 1>::toStringImpl(e);   \
         }                                                                                                                       \
     };                                                                                                                          \
+                                                                                                                                \
     public:                                                                                                                     \
     constexpr ConstString toString() const;                                                                                     \
     constexpr ConstString getEnumName() const noexcept                                                                          \

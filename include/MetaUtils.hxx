@@ -8,8 +8,6 @@ namespace Meta
 template<class ...>
 using void_t = void;
 
-template<class...>
-using void_t = void;
 
 template<class T, class Iterator, class = void>
 struct is_unchecked_iterator_of
