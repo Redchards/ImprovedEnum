@@ -185,10 +185,44 @@ struct range : private Details::reduced_pair<Iterator, Iterator>
         CONSTEXPR_ASSERT(Details::difference(begin(), end()), "The begining of the range is past after the end of the range");
     }
     
-    // TODO : Only if random access iterator ! Need to handle other cases !!!
-    constexpr size_t size() const noexcept
+    constexpr reference front() const
+    {
+        CONSTEXPR_ASSERT(!empty(), "Attempted to take the first element of an empty range !");
+        
+        return *begin();
+    }
+    
+    constexpr reference back() const
+    {
+        CONSTEXPR_ASSERT(!empty(), "Attempted to take the last element of an empty range !");
+        
+        Iterator tmp = end();
+        --tmp;
+        return *tmp;
+    }
+    
+    constexpr bool empty() const
+    {
+        return size() == 0;
+    }
+
+    constexpr size_t size() const
     {
         return Details::difference(begin(), end());
+    }
+    
+    constexpr void pop_front()
+    {
+        CONSTEXPR_ASSERT(!empty(), "Attempted to pop on an empty range !");    
+    
+        ++first;
+    }
+    
+    constexpr void pop_back()
+    {
+        CONSTEXPR_ASSERT(!empty(), "Attempted to pop on an empty range !");
+        
+        --last;
     }
     
     constexpr iterator begin() const noexcept

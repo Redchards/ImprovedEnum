@@ -9,7 +9,7 @@ using namespace mettle;
 
 #include <ImprovedEnum.hxx>
 
-iterable_ENUM(iterableEnumTst1, size_t,
+ITERABLE_ENUM(IteratableEnumTst1, size_t,
 	Test1,
 	Test2,
 	Test3,
@@ -17,7 +17,7 @@ iterable_ENUM(iterableEnumTst1, size_t,
 	Test5
 );
 
-iterable_ENUM(iterableEnumTst2, size_t,
+ITERABLE_ENUM(IteratableEnumTst2, size_t,
 	Test1,
 	Test2,
 	Test3,
@@ -30,7 +30,7 @@ iterable_ENUM(iterableEnumTst2, size_t,
 	Test10
 );
 
-iterable_ENUM(iterableEnumTst3, size_t,
+ITERABLE_ENUM(IteratableEnumTst3, size_t,
 	Test1,
 	Test2 = 9,
 	Test3 = 12,
@@ -67,11 +67,11 @@ IMPROVED_ENUM(ImprovedEnumTst3, size_t,
 	Test5
 );
 
-using iterableEnumTestList = 
+using IteratableEnumTestList = 
 	std::tuple<
-		iterableEnumTst1,
-		iterableEnumTst2,
-		iterableEnumTst3
+		IteratableEnumTst1,
+		IteratableEnumTst2,
+		IteratableEnumTst3
 	>;
 	
 using improvedEnumTestList = 
@@ -88,7 +88,7 @@ struct enumFixture
 };
 
 template<class EnumName>
-auto iterableEnumTestCode()
+auto IteratableEnumTestCode()
 {
 	return [](auto &_) {
 		_.setup([](enumFixture<EnumName>& fixture) {
@@ -341,7 +341,7 @@ auto improvedEnumTestCode()
 			size_t i = 4;
 			for(auto val : EnumName::iterableFrom(EnumName::Test5))
 			{
-				expect(val.toString(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
+				expect(val.toString(), equal_to(std::string{"Test"} + std::to_string(i)));
 				++i;
 			}
 		});
@@ -350,26 +350,26 @@ auto improvedEnumTestCode()
 
 
 
-template<class iterableEnumList, class ImprovedEnumList>
+template<class IteratableEnumList, class ImprovedEnumList>
 class EnumTestRunner
 {
 	public:
 	EnumTestRunner()
 	{
-		runEachiterableEnumTest();
+		runEachIteratableEnumTest();
 		runEachImprovedEnumTest();
 	}
 	
-	static void runEachiterableEnumTest()
+	static void runEachIteratableEnumTest()
 	{
-		runEachiterableEnumTestImpl(std::make_integer_sequence<size_t, std::tuple_size<iterableEnumList>::value>{});
+		runEachIteratableEnumTestImpl(std::make_integer_sequence<size_t, std::tuple_size<IteratableEnumList>::value>{});
 	}
 	
 	template<size_t ... Indices>
-	static void runEachiterableEnumTestImpl(std::integer_sequence<size_t, Indices...>)
+	static void runEachIteratableEnumTestImpl(std::integer_sequence<size_t, Indices...>)
 	{
-		(void)std::initializer_list<bool>{(suite<enumFixture<std::remove_reference_t<decltype(std::get<Indices>(std::declval<iterableEnumList>()))>>>
-										 {"Automatic enum test", iterableEnumTestCode<std::remove_reference_t<decltype(std::get<Indices>(std::declval<iterableEnumList>()))>>()}, true)...};
+		(void)std::initializer_list<bool>{(suite<enumFixture<std::remove_reference_t<decltype(std::get<Indices>(std::declval<IteratableEnumList>()))>>>
+										 {"Automatic enum test", IteratableEnumTestCode<std::remove_reference_t<decltype(std::get<Indices>(std::declval<IteratableEnumList>()))>>()}, true)...};
 	}
 	
 	static void runEachImprovedEnumTest()
@@ -382,13 +382,13 @@ class EnumTestRunner
 	{
 		(void)std::initializer_list<bool>{
 			(suite<enumFixture<std::remove_reference_t<decltype(std::get<Indices>(std::declval<ImprovedEnumList>()))>>>
-			{"Automatic enum test", iterableEnumTestCode<std::remove_reference_t<decltype(std::get<Indices>(std::declval<ImprovedEnumList>()))>>()},
+			{"Automatic enum test", IteratableEnumTestCode<std::remove_reference_t<decltype(std::get<Indices>(std::declval<ImprovedEnumList>()))>>()},
 			suite<enumFixture<std::remove_reference_t<decltype(std::get<Indices>(std::declval<ImprovedEnumList>()))>>>
 			{"Automatic enum test", improvedEnumTestCode<std::remove_reference_t<decltype(std::get<Indices>(std::declval<ImprovedEnumList>()))>>()}, true)...
 		};
 	}
 };
 
-EnumTestRunner<iterableEnumTestList, improvedEnumTestList> runner{};
+EnumTestRunner<IteratableEnumTestList, improvedEnumTestList> runner{};
 
 #endif // ENUM_UTILS_TEST_HXX

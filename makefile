@@ -497,7 +497,7 @@ LINE:=$(shell printf "%$$(tput cols)s" | tr " " "=")
 ifeq ($(filter $(MAKECMDGOALS), noinfo),)
 build-info:
 	@printf $(LINE)"\n\e[1m\e[91m$(shell export HEADER_MSG=$(HEADER_MSG); printf " %.0s" $$(seq 1 $$(($$(tput cols)/2 - $${#HEADER_MSG}/2)))) "$(HEADER_MSG)"\e[0m\n\
-	Generation configuration is \e[1m\e[32m$(EXECUTION) $(TESTMOD) $(CONFIGNAME)\e[0m\n\n\
+	Generation configuration is \e[1m\e[32m$(EXECUTION) $(if$(TESTMOD),$(TESTMOD),)$(CONFIGNAME)\e[0m\n\n\
 	Sources directory search path is :   \e[1m\e[96m$(SRCDIR)\e[0m (SRCDIR)\n\
 	Includes directory search path is :  \e[1m\e[96m$(INCLDIR)\e[0m (INCLDIR)\n\
 	Libraries directory search path is : \e[1m\e[96m$(LIBDIR)\e[0m (LIBDIR)\n\
