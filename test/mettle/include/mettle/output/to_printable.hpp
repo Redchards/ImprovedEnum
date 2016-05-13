@@ -14,6 +14,8 @@
 #include "../detail/string_algorithm.hpp"
 #include "../detail/tuple_algorithm.hpp"
 
+// Slighty modified file to support "const char*" and "ConstString" display.
+
 namespace mettle {
 
 // The to_printable overloads below are rather complicated, to say the least; we

@@ -235,7 +235,7 @@ class EnumName                                                                  
         return size_; /* Or error ? */                                                                                          \
     }                                                                                                                           \
                                                                                                                                 \
-    constexpr ConstString getEnumName() const noexcept                                                                          \
+    static constexpr ConstString getEnumName() noexcept                                                                         \
     {                                                                                                                           \
         return enumName;                                                                                                        \
     }                                                                                                                           \
@@ -346,7 +346,7 @@ class EnumName                                                                  
                                                                                                                                 \
     public:                                                                                                                     \
     constexpr ConstString toString() const;                                                                                     \
-    constexpr ConstString getEnumName() const noexcept                                                                          \
+    static constexpr ConstString getEnumName() noexcept                                                                         \
     {                                                                                                                           \
         return enumName;                                                                                                        \
     }                                                                                                                           \
@@ -368,7 +368,7 @@ struct EnumName::Looper<EnumName::size_>                                        
 {                                                                                                                               \
     static constexpr ConstString toStringImpl(EnumName)                                                                         \
     {                                                                                                                           \
-        return "";                                                                                                         \
+        return "";                                                                                                              \
     }                                                                                                                           \
 };                                                                                                                              \
 constexpr ConstString EnumName::toString() const                                                                                \
