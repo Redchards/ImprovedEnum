@@ -1,8 +1,8 @@
 #ImprovedEnum
-A small header-only utility library to allow iteratable and serialiazable enum in C++14. The goal of this library is to provide features yet lacking in standard C++ in order to make enum more useful. This was also a pretty good occasion to test C++ relaxed constexpr capabilities, which are pretty amazing.
+A small header-only utility library to allow iterable and serialiazable enum in C++14. The goal of this library is to provide features yet lacking in standard C++ in order to make enum more useful. This was also a pretty good occasion to test C++ relaxed constexpr capabilities, which are pretty amazing.
 
 #Features
-Improved enumerations comes in two flavor : iteratable enums, and stringizable enums.
+Improved enumerations comes in two flavor : iterable enums, and stringizable enums.
 
 Iteratable enums are simple enums with added iteration capability. Thus, iteration from an element of the enum or in a range-based loop is supported. One can also retrieve the enum name using the ```getEnumName()``` static method, and the size via the ```size()``` static method.
 
