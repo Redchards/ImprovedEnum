@@ -41,11 +41,11 @@ ITERABLE_ENUM(IterableEnumTst3, size_t,
 ITERABLE_ENUM(IterableEnumTst4, size_t,
 	Test1,
 	Test2 = 9,
-	Test3 = 12,
+	Test3 = 13,
 	Test4 = 27,
 	Test5 = 12,
 	OtherTest = 50,
-	LastTest = 27
+	LastTest = 28
 );
 
 IMPROVED_ENUM(ImprovedEnumTst1, size_t,

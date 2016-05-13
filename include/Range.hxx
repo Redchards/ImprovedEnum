@@ -166,7 +166,7 @@ struct range : private Details::reduced_pair<Iterator, Iterator>
     constexpr range(OtherIterator first, OtherIterator last)
     : base(std::move(first), std::move(last))
     {
-        CONSTEXPR_ASSERT(Details::difference(begin(), end()), "The begining of the range is past after the end of the range");
+        CONSTEXPR_ASSERT(Details::difference(begin(), end()) >= 0, "The begining of the range is past after the end of the range");
     }
     
     template<class OtherIterator,
@@ -174,15 +174,15 @@ struct range : private Details::reduced_pair<Iterator, Iterator>
     constexpr range(range<OtherIterator> rg)
     : range(rg.first, rg.last)
     {
-        CONSTEXPR_ASSERT(Details::difference(begin(), end()), "The begining of the range is past after the end of the range");
+        CONSTEXPR_ASSERT(Details::difference(begin(), end()) >= 0, "The begining of the range is past after the end of the range");
     }
     
     template<class OtherIterator1, class OtherIterator2,
              typename = std::enable_if_t<std::is_convertible<OtherIterator1, Iterator>::value && std::is_convertible<OtherIterator2, Iterator>::value>>
     constexpr range(std::pair<OtherIterator1, OtherIterator2> rg)
-    : range(rg.first, rg.last)
+    : range(rg.first, rg.second)
     {
-        CONSTEXPR_ASSERT(Details::difference(begin(), end()), "The begining of the range is past after the end of the range");
+        CONSTEXPR_ASSERT(Details::difference(begin(), end()) >= 0, "The begining of the range is past after the end of the range");
     }
     
     constexpr reference front() const

@@ -333,7 +333,6 @@ ifeq ($(firstword $(MAKECMDGOALS)),test)
 	TESTS=$(addprefix $(BINDIR)/$(PLATFORM)/$(CONFIG)/, $(TEST))
 	override TESTMOD=test
 	DEPS+=$(TESTDEPS)
-$(warning $(DEPS))
 	#TEST_OBJS=$(addprefix $(OBJDIR)/$(TESTDIR)/$(PLATFORM)/$(CONFIG)/, $(OBJ))
 else ifneq ($(filter $(MAKECMDGOALS),test),)
 $(warning "The 'test' option will not be taken in account unless in first position.");
