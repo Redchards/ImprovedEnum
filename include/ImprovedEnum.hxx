@@ -333,15 +333,17 @@ class EnumName                                                                  
         return size_; /* Or error ? */                                                                                          \
     }                                                                                                                           \
                                                                                                                                 \
+    private:                                                                                                                    \
     template<size_t index>                                                                                                      \
     struct Looper                                                                                                               \
     {                                                                                                                           \
         static constexpr ConstString toStringImpl(EnumName e)                                                                   \
         {                                                                                                                       \
             static_assert(index < e.size_, "Out of range !");                                                                   \
-            return e.values[index] == e.value_ ? ConstString{std::get<index>(e.names_)} : Looper<index + 1>::toStringImpl(e);                \
+            return e.values[index] == e.value_ ? ConstString{std::get<index>(e.names_)} : Looper<index + 1>::toStringImpl(e);   \
         }                                                                                                                       \
     };                                                                                                                          \
+    public:                                                                                                                     \
     constexpr ConstString toString() const;                                                                                     \
     constexpr ConstString getEnumName() const noexcept                                                                          \
     {                                                                                                                           \
