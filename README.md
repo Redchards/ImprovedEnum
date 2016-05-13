@@ -82,6 +82,11 @@ val = MyEnum::FooBar;
 std::cout << val.toString() << std::endl; // Output : FooBar
 ```
 
+#Performances
+As said above, in term of runtime performance this code is almost optimal, as everything is done at compile time. However, due to the metaprogramming used under the hood, it can increase compilation time. However, to add one second to the compilation time on a fairly old machine (laptop with i3 CPU), you need to declare a dozens of enumerations with 10-15 elements in each. There is obviously optimizations to make in some places, but relying on template to keep type safety has the side effect of slowing down compile time anyway, whatever you're trying to optimize.
+
+If this seems a too big constrain to you, check the alternatives below.
+
 #Similar projects
 There is few similar projects around the internet, and more specificaly this one :
 https://github.com/aantron/better-enums
