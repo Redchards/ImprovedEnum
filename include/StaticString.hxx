@@ -43,7 +43,10 @@ public:
 		static_assert(otherSize <= (Tsize + 1), "The string used to initialize the StaticString do not fit !");
 	}
 
-	// TODO : Make constexpr assert !!!
+	template<class Iterator>
+	constexpr StaticString(Iterator begin, Iterator end) : StaticString{range<Iterator>{begin, end}}
+	{}
+	
 	template<class Iterator>
 	constexpr StaticString(range<Iterator> range) : str_{initStrRange<Iterator, Tsize>(range)}, actualSize_{range.size()}
 	{

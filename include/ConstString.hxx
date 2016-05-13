@@ -10,6 +10,7 @@
 #include <ArrayIteratorPolicy.hxx>
 #include <MetaUtils.hxx>
 #include <Range.hxx>
+#include <StaticString.hxx>
 #include <StringDetails.hxx>
 
 class ConstString
@@ -33,6 +34,10 @@ public:
 
 	template<size_t size>
 	constexpr ConstString(const char(&cstr)[size]) noexcept : size_(size - 1), cstr_(cstr)
+	{}
+	
+	template<class TString>
+	constexpr ConstString(const TString& other) noexcept : size_(other.size()), cstr_(other.data())
 	{}
 	
 	constexpr iterator begin() noexcept { return { *this, 0 }; }

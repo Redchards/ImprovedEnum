@@ -83,11 +83,11 @@ namespace Details
 template<size_t Tsize>
 constexpr const StaticString<Tsize> stringifyEnumInitializerHelper(ConstString str) noexcept
 {
-    return { range<ConstString::const_iterator>{str.begin(), str.find('=')} };
+    return {str.begin(), str.find('=')};
 }
 }
 
-#define STRINGIFY_ENUM_EQUAL_RANGE(string, stringType) range<stringType::const_iterator>{stringType{string}.begin(), stringType{string}.find('=')}
+//#define STRINGIFY_ENUM_EQUAL_RANGE(string, stringType) range<stringType::const_iterator>{stringType{string}.begin(), stringType{string}.find('=')}
 #define STRINGIFY_ENUM_HELPER(string, stringType) stringType{STRINGIFY_ENUM_EQUAL_RANGE(string, stringType)}
 #ifdef TRIM_ENUM_NAME
 #define STRINGIFY_ENUM(x, next) Details::stringifyEnumInitializerHelper<ConstString{STRINGIFY(x)}.size()>(STRINGIFY(x)).trim() IF(next)(ADD_COMMA, EMPTY_ACTION)()
@@ -161,7 +161,7 @@ class EnumIterator : public std::conditional_t<tag == EnumIteratorTag::Normal,
 
 }
 
-#define iterable_ENUM(EnumName, underlyingType, ...)                                                                          \
+#define ITERABLE_ENUM(EnumName, underlyingType, ...)                                                                            \
 static_assert(std::is_integral<underlyingType>::value,                                                                          \
     "The defined underlying type is not an integral type");                                                                     \
 class EnumName                                                                                                                  \
@@ -336,13 +336,13 @@ class EnumName                                                                  
     template<size_t index>                                                                                                      \
     struct Looper                                                                                                               \
     {                                                                                                                           \
-        static constexpr const char* toStringImpl(EnumName e)                                                                   \
+        static constexpr ConstString toStringImpl(EnumName e)                                                                   \
         {                                                                                                                       \
             static_assert(index < e.size_, "Out of range !");                                                                   \
-            return e.values[index] == e.value_ ? std::get<index>(e.names_) : Looper<index + 1>::toStringImpl(e);                \
+            return e.values[index] == e.value_ ? ConstString{std::get<index>(e.names_)} : Looper<index + 1>::toStringImpl(e);                \
         }                                                                                                                       \
     };                                                                                                                          \
-    constexpr const char* toString() const;                                                                                     \
+    constexpr ConstString toString() const;                                                                                     \
     constexpr ConstString getEnumName() const noexcept                                                                          \
     {                                                                                                                           \
         return enumName;                                                                                                        \
@@ -363,12 +363,12 @@ class EnumName                                                                  
 template<>                                                                                                                      \
 struct EnumName::Looper<EnumName::size_>                                                                                        \
 {                                                                                                                               \
-    static constexpr const char* toStringImpl(EnumName)                                                                         \
+    static constexpr ConstString toStringImpl(EnumName)                                                                         \
     {                                                                                                                           \
-        return nullptr;                                                                                                         \
+        return "";                                                                                                         \
     }                                                                                                                           \
 };                                                                                                                              \
-constexpr const char* EnumName::toString() const                                                                                \
+constexpr ConstString EnumName::toString() const                                                                                \
 {                                                                                                                               \
     return Looper<0>::toStringImpl(*this);                                                                                      \
 }                                                                                                                               \

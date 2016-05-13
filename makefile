@@ -87,7 +87,7 @@ LIBDIR:= lib
 OBJDIR:= obj
 SRCDIR:= src
 TESTDIR:= test
-INCLDIR:= include
+INCLDIR:= include .
 BINDIR:= bin
 SCANDIR:= scan
 
