@@ -67,7 +67,7 @@ namespace Details
 }
 
 #define SANE_LIST_BUILDER_HELPER(x, next) x IF(next)(ADD_COMMA, EMPTY_ACTION)()
-#define ENUM_ASSIGN_REMOVE(type) (const Details::AssignmentRemover<type::internal##type>)type::SANE_LIST_BUILDER_HELPER
+#define ENUM_ASSIGN_REMOVE(type) (const Details::AssignmentRemover<type::Internal##type>)type::SANE_LIST_BUILDER_HELPER
 #define ENUM_UPWARD_CONV(type) (type) SANE_LIST_BUILDER_HELPER
 #define BRACE_ENCLOSE_INIT(x, next) {x} IF(next)(ADD_COMMA, EMPTY_ACTION)()
 
@@ -97,7 +97,7 @@ namespace EnumUtils
 // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0031r0.html
 // Let's hope this got accepted in the next standard, this would cut a lot of verbose in this code.
 
-// NOTE : The operator-> reintepret_cast is safe, as the class EnumName will contain only a EnumName::internal##EnumName value anyway.
+// NOTE : The operator-> reintepret_cast is safe, as the class EnumName will contain only a EnumName::Internal##EnumName value anyway.
 // The other members are static constexpr variables, or member functions.
 
 enum class EnumIteratorTag : uint8_t
@@ -156,7 +156,7 @@ static_assert(std::is_integral<underlyingType>::value,                          
 class EnumName                                                                                                                  \
 {                                                                                                                               \
     public:                                                                                                                     \
-    enum internal##EnumName : underlyingType{ __VA_ARGS__ };                                                                    \
+    enum Internal##EnumName : underlyingType{ __VA_ARGS__ };                                                                    \
                                                                                                                                 \
     using iterator = EnumUtils::EnumIterator<EnumName, EnumUtils::EnumIteratorTag::Normal>;                                     \
     using const_iterator = iterator;                                                                                            \
@@ -165,9 +165,9 @@ class EnumName                                                                  
     using TupleType = std::tuple<MAP2(ENUM_NAME_TUPLE_DECL, __VA_ARGS__)>;                                                      \
                                                                                                                                 \
     public:                                                                                                                     \
-    constexpr EnumName(internal##EnumName value) noexcept : value_{value} {}                                                    \
+    constexpr EnumName(Internal##EnumName value) noexcept : value_{value} {}                                                    \
     constexpr EnumName(const EnumName& other) noexcept : value_{other.value_} {}                                                \
-    constexpr EnumName operator=(internal##EnumName value) noexcept { value_ = value; return *this; }                           \
+    constexpr EnumName operator=(Internal##EnumName value) noexcept { value_ = value; return *this; }                           \
     constexpr EnumName operator=(const EnumName& other) noexcept { value_ = other.value_; return *this; }                       \
                                                                                                                                 \
     constexpr underlyingType toUnderlying() const noexcept                                                                      \
@@ -185,27 +185,35 @@ class EnumName                                                                  
     }                                                                                                                           \
                                                                                                                                 \
     private:                                                                                                                    \
-    class iterableHelper                                                                                                      \
+    class IterableHelper                                                                                                        \
     {                                                                                                                           \
         public:                                                                                                                 \
-        static constexpr EnumName::iterator begin() noexcept { return { 0, EnumName::iterator::indexInitFlag{} }; }             \
-        static constexpr EnumName::const_iterator cbegin() noexcept { return begin(); }                                         \
-        static constexpr EnumName::iterator end() noexcept { return { EnumName::size(), EnumName::iterator::indexInitFlag{} }; }\
-        static constexpr EnumName::const_iterator cend() noexcept { return end(); }                                             \
+        constexpr IterableHelper() : value_{values[0]}{}                                                                        \
+        constexpr IterableHelper(Internal##EnumName value) : value_{value}{}                                                    \
                                                                                                                                 \
-        static constexpr EnumName::reverse_iterator rbegin() noexcept { return end(); }                                         \
-        static constexpr EnumName::const_reverse_iterator crbegin() noexcept { return end(); }                                  \
-        static constexpr EnumName::reverse_iterator rend() noexcept { return begin(); }                                         \
-        static constexpr EnumName::const_reverse_iterator crend() noexcept { return begin(); }                                  \
+                                                                                                                                \
+        constexpr EnumName::iterator begin() noexcept { return { value_ }; }                                                    \
+        constexpr EnumName::const_iterator cbegin() noexcept { return begin(); }                                                \
+        constexpr EnumName::iterator end() noexcept { return { size_, EnumName::iterator::indexInitFlag{} }; }                  \
+        constexpr EnumName::const_iterator cend() noexcept { return end(); }                                                    \
+                                                                                                                                \
+        constexpr EnumName::reverse_iterator rbegin() noexcept { return end(); }                                                \
+        constexpr EnumName::const_reverse_iterator crbegin() noexcept { return end(); }                                         \
+        constexpr EnumName::reverse_iterator rend() noexcept { return begin(); }                                                \
+        constexpr EnumName::const_reverse_iterator crend() noexcept { return begin(); }                                         \
                                                                                                                                 \
         static constexpr EnumName::iterator from(EnumName e) noexcept { return { e }; }                                         \
         static constexpr EnumName::const_iterator cfrom(EnumName e) noexcept { return { e }; }                                  \
         static constexpr EnumName::reverse_iterator rfrom(EnumName e) noexcept { return { e }; }                                \
         static constexpr EnumName::const_reverse_iterator crfrom(EnumName e) noexcept { return { e }; }                         \
+                                                                                                                                \
+        private:                                                                                                                \
+        Internal##EnumName value_;                                                                                              \
     };                                                                                                                          \
                                                                                                                                 \
     public:                                                                                                                     \
-    static constexpr iterableHelper iterable() noexcept{ return {}; }                                                       \
+    static constexpr IterableHelper iterable() noexcept{ return {}; }                                                           \
+    static constexpr IterableHelper iterableFrom(Internal##EnumName value) noexcept{ return {value}; }                          \
                                                                                                                                 \
     constexpr size_t getIndex() const noexcept                                                                                  \
     {                                                                                                                           \
@@ -222,13 +230,13 @@ class EnumName                                                                  
     }                                                                                                                           \
                                                                                                                                 \
     protected:                                                                                                                  \
-    internal##EnumName value_;                                                                                                  \
+    Internal##EnumName value_;                                                                                                  \
                                                                                                                                 \
     static constexpr size_t size_ = std::tuple_size<TupleType>::value;                                                          \
     static constexpr ConstString enumName = #EnumName;                                                                          \
                                                                                                                                 \
     public:                                                                                                                     \
-    using ValuesArrayType = std::array<internal##EnumName, size_>;                                                              \
+    using ValuesArrayType = std::array<Internal##EnumName, size_>;                                                              \
     static constexpr ValuesArrayType values{{MAP2(ENUM_ASSIGN_REMOVE(EnumName), __VA_ARGS__)}};                                 \
 };                                                                                                                              \
 constexpr ConstString EnumName::enumName;                                                                                       \
@@ -246,7 +254,7 @@ static_assert(std::is_integral<underlyingType>::value,                          
 class EnumName                                                                                                                  \
 {                                                                                                                               \
     public:                                                                                                                     \
-    enum internal##EnumName : underlyingType{ __VA_ARGS__ };                                                                    \
+    enum Internal##EnumName : underlyingType{ __VA_ARGS__ };                                                                    \
                                                                                                                                 \
     using iterator = EnumUtils::EnumIterator<EnumName, EnumUtils::EnumIteratorTag::Normal>;                                     \
     using const_iterator = iterator;                                                                                            \
@@ -255,9 +263,9 @@ class EnumName                                                                  
     using TupleType = std::tuple<MAP2(ENUM_NAME_TUPLE_DECL, __VA_ARGS__)>;                                                      \
                                                                                                                                 \
     public:                                                                                                                     \
-    constexpr EnumName(internal##EnumName value) noexcept : value_{value} {}                                                    \
+    constexpr EnumName(Internal##EnumName value) noexcept : value_{value} {}                                                    \
     constexpr EnumName(const EnumName& other) noexcept : value_{other.value_} {}                                                \
-    constexpr EnumName operator=(internal##EnumName value) noexcept { value_ = value; return *this; }                           \
+    constexpr EnumName operator=(Internal##EnumName value) noexcept { value_ = value; return *this; }                           \
     constexpr EnumName operator=(const EnumName& other) noexcept { value_ = other.value_; return *this; }                       \
                                                                                                                                 \
     constexpr underlyingType toUnderlying() const noexcept                                                                      \
@@ -275,28 +283,35 @@ class EnumName                                                                  
     }                                                                                                                           \
                                                                                                                                 \
     private:                                                                                                                    \
-    /* TODO : Add 'iterableFrom' method for better range-based loop  */                                                         \
-    class iterableHelper                                                                                                      \
+    class IterableHelper                                                                                                        \
     {                                                                                                                           \
         public:                                                                                                                 \
-        static constexpr EnumName::iterator begin() noexcept { return { 0, EnumName::iterator::indexInitFlag{} }; }             \
-        static constexpr EnumName::const_iterator cbegin() noexcept { return begin(); }                                         \
-        static constexpr EnumName::iterator end() noexcept { return { size_, EnumName::iterator::indexInitFlag{} }; }           \
-        static constexpr EnumName::const_iterator cend() noexcept { return end(); }                                             \
+        constexpr IterableHelper() : value_{values[0]}{}                                                                        \
+        constexpr IterableHelper(Internal##EnumName value) : value_{value}{}                                                    \
                                                                                                                                 \
-        static constexpr EnumName::reverse_iterator rbegin() noexcept { return end(); }                                         \
-        static constexpr EnumName::const_reverse_iterator crbegin() noexcept { return end(); }                                  \
-        static constexpr EnumName::reverse_iterator rend() noexcept { return begin(); }                                         \
-        static constexpr EnumName::const_reverse_iterator crend() noexcept { return begin(); }                                  \
+                                                                                                                                \
+        constexpr EnumName::iterator begin() noexcept { return { value_ }; }                                                    \
+        constexpr EnumName::const_iterator cbegin() noexcept { return begin(); }                                                \
+        constexpr EnumName::iterator end() noexcept { return { size_, EnumName::iterator::indexInitFlag{} }; }                  \
+        constexpr EnumName::const_iterator cend() noexcept { return end(); }                                                    \
+                                                                                                                                \
+        constexpr EnumName::reverse_iterator rbegin() noexcept { return end(); }                                                \
+        constexpr EnumName::const_reverse_iterator crbegin() noexcept { return end(); }                                         \
+        constexpr EnumName::reverse_iterator rend() noexcept { return begin(); }                                                \
+        constexpr EnumName::const_reverse_iterator crend() noexcept { return begin(); }                                         \
                                                                                                                                 \
         static constexpr EnumName::iterator from(EnumName e) noexcept { return { e }; }                                         \
         static constexpr EnumName::const_iterator cfrom(EnumName e) noexcept { return { e }; }                                  \
         static constexpr EnumName::reverse_iterator rfrom(EnumName e) noexcept { return { e }; }                                \
         static constexpr EnumName::const_reverse_iterator crfrom(EnumName e) noexcept { return { e }; }                         \
+                                                                                                                                \
+        private:                                                                                                                \
+        Internal##EnumName value_;                                                                                              \
     };                                                                                                                          \
                                                                                                                                 \
     public:                                                                                                                     \
-    static constexpr iterableHelper iterable() noexcept{ return {}; }                                                       \
+    static constexpr IterableHelper iterable() noexcept{ return {}; }                                                           \
+    static constexpr IterableHelper iterableFrom(Internal##EnumName value) noexcept{ return {value}; }                          \
                                                                                                                                 \
     constexpr size_t getIndex() const noexcept                                                                                  \
     {                                                                                                                           \
@@ -323,14 +338,14 @@ class EnumName                                                                  
     }                                                                                                                           \
                                                                                                                                 \
     private:                                                                                                                    \
-    internal##EnumName value_;                                                                                                  \
+    Internal##EnumName value_;                                                                                                  \
                                                                                                                                 \
     static constexpr size_t size_ = std::tuple_size<TupleType>::value;                                                          \
     static constexpr TupleType names_{MAP2(STRINGIFY_ENUM, __VA_ARGS__)};                                                       \
     static constexpr ConstString enumName = #EnumName;                                                                          \
                                                                                                                                 \
     public:                                                                                                                     \
-    using ValuesArrayType = std::array<internal##EnumName, size_>;                                                              \
+    using ValuesArrayType = std::array<Internal##EnumName, size_>;                                                              \
     static constexpr ValuesArrayType values{{MAP2(ENUM_ASSIGN_REMOVE(EnumName), __VA_ARGS__)}};                                 \
 };                                                                                                                              \
                                                                                                                                 \

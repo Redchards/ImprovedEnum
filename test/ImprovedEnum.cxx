@@ -227,6 +227,51 @@ auto iterableEnumTestCode()
 				--i;
 			}
 		});
+		
+		_.test("Iterate from first element", [](enumFixture<EnumName>& fixture) {
+			size_t i = 0;
+			for(auto val : EnumName::iterableFrom(EnumName::Test1))
+			{
+				expect(val.toUnderlying(), equal_to(fixture.values[i]));
+				++i;
+			}
+		});
+		
+		_.test("Iterate from second element", [](enumFixture<EnumName>& fixture) {
+			size_t i = 1;
+			for(auto val : EnumName::iterableFrom(EnumName::Test2))
+			{
+				expect(val.toUnderlying(), equal_to(fixture.values[i]));
+				++i;
+			}
+		});
+		
+		_.test("Iterate from third element", [](enumFixture<EnumName>& fixture) {
+			size_t i = 2;
+			for(auto val : EnumName::iterableFrom(EnumName::Test3))
+			{
+				expect(val.toUnderlying(), equal_to(fixture.values[i]));
+				++i;
+			}
+		});
+		
+		_.test("Iterate from fourth element", [](enumFixture<EnumName>& fixture) {
+			size_t i = 3;
+			for(auto val : EnumName::iterableFrom(EnumName::Test4))
+			{
+				expect(val.toUnderlying(), equal_to(fixture.values[i]));
+				++i;
+			}
+		});
+		
+		_.test("Iterate from fifth element", [](enumFixture<EnumName>& fixture) {
+			size_t i = 4;
+			for(auto val : EnumName::iterableFrom(EnumName::Test5))
+			{
+				expect(val.toUnderlying(), equal_to(fixture.values[i]));
+				++i;
+			}
+		});
 	};
 }
 
@@ -253,6 +298,51 @@ auto improvedEnumTestCode()
 			{
 				expect(it->toString(), equal_to(std::string{"Test"} + std::to_string(i)));
 				i += 2;
+			}
+		});
+		
+		_.test("Iterate from first element", [](enumFixture<EnumName>&) {
+			size_t i = 0;
+			for(auto val : EnumName::iterableFrom(EnumName::Test1))
+			{
+				expect(val.toString(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
+				++i;
+			}
+		});
+		
+		_.test("Iterate from second element", [](enumFixture<EnumName>&) {
+			size_t i = 1;
+			for(auto val : EnumName::iterableFrom(EnumName::Test2))
+			{
+				expect(val.toString(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
+				++i;
+			}
+		});
+		
+		_.test("Iterate from third element", [](enumFixture<EnumName>&) {
+			size_t i = 2;
+			for(auto val : EnumName::iterableFrom(EnumName::Test3))
+			{
+				expect(val.toString(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
+				++i;
+			}
+		});
+		
+		_.test("Iterate from fourth element", [](enumFixture<EnumName>&) {
+			size_t i = 3;
+			for(auto val : EnumName::iterableFrom(EnumName::Test4))
+			{
+				expect(val.toString(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
+				++i;
+			}
+		});
+		
+		_.test("Iterate from fifth element", [](enumFixture<EnumName>&) {
+			size_t i = 4;
+			for(auto val : EnumName::iterableFrom(EnumName::Test5))
+			{
+				expect(val.toString(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
+				++i;
 			}
 		});
 	};
