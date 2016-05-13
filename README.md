@@ -1,8 +1,8 @@
 #ImprovedEnum
-A small header-only utility library to allow iteratable and serialiazable enum in C++14. The goal of this library is to provide features yet lacking in standard C++ in order to make enum more useful. This was also a pretty good occasion to test C++ relaxed constexpr capabilities, which are pretty amazing.
+A small header-only utility library to allow iterable and serialiazable enum in C++14. The goal of this library is to provide features yet lacking in standard C++ in order to make enum more useful. This was also a pretty good occasion to test C++ relaxed constexpr capabilities, which are pretty amazing.
 
 #Features
-Improved enumerations comes in two flavor : iteratable enums, and stringizable enums.
+Improved enumerations comes in two flavor : iterable enums, and stringizable enums.
 
 Iteratable enums are simple enums with added iteration capability. Thus, iteration from an element of the enum or in a range-based loop is supported. One can also retrieve the enum name using the ```getEnumName()``` static method, and the size via the ```size()``` static method.
 
@@ -81,6 +81,11 @@ std::cout << val.toString() << std::endl; // Output : Bar
 val = MyEnum::FooBar;
 std::cout << val.toString() << std::endl; // Output : FooBar
 ```
+
+#Performances
+As said above, in term of runtime performance this code is almost optimal, as everything is done at compile time. However, due to the metaprogramming used under the hood, it can increase compilation time. However, to add one second to the compilation time on a fairly old machine (laptop with i3 CPU), you need to declare a dozens of enumerations with 10-15 elements in each. There is obviously optimizations to make in some places, but relying on template to keep type safety has the side effect of slowing down compile time anyway, whatever you're trying to optimize.
+
+If this seems a too big constrain to you, check the alternatives below.
 
 #Similar projects
 There is few similar projects around the internet, and more specificaly this one :
