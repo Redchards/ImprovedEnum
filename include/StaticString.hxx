@@ -58,20 +58,32 @@ public:
 	constexpr const_iterator cend() const noexcept { return end(); }
 
 	constexpr reverse_iterator rbegin() noexcept { return end(); }
-	constexpr const_reverse_iterator rbegin() const noexcept { return end(); }
-	constexpr const_reverse_iterator crbegin() const noexcept { return end(); }
+	constexpr const_reverse_iterator rbegin() const noexcept { return cend(); }
+	constexpr const_reverse_iterator crbegin() const noexcept { return cend(); }
 	constexpr reverse_iterator rend() noexcept { return begin(); }
-	constexpr const_reverse_iterator rend() const noexcept { return begin(); }
-	constexpr const_reverse_iterator crend() const noexcept { return begin(); }
+	constexpr const_reverse_iterator rend() const noexcept { return cbegin(); }
+	constexpr const_reverse_iterator crend() const noexcept { return cbegin(); }
 
-	constexpr char at(size_t index) const
+	constexpr char& at(size_t index)
 	{
 		CONSTEXPR_ASSERT(index < actualSize_, "Attempt to access a non-existing index of a StaticString");
 		return str_[index];
 		//return (index < actualSize_ ? str_[index] : throw std::out_of_range("Attempt to access a non-existing index of a StaticString"));
 	}
+	
+	constexpr const char& at(size_t index) const
+	{
+		CONSTEXPR_ASSERT(index < actualSize_, "Attempt to access a non-existing index of a StaticString");
+		return str_[index];
+	}
+	
+	constexpr char& operator[](size_t index)
+	{
+		return at(index);
+		//return (index < actualSize_ ? str_[index] : throw std::out_of_range("Attempt to access a non-existing index of a StaticString"));
+	}
 
-	constexpr char operator[](size_t index) const
+	constexpr const char& operator[](size_t index) const
 	{
 		return at(index);
 		//return (index < actualSize_ ? str_[index] : throw std::out_of_range("Attempt to access a non-existing index of a StaticString"));
@@ -87,8 +99,7 @@ public:
 		return &str_[0];
 	}
 	
-	constexpr auto find(char c) const noexcept
-	-> decltype(begin())
+	constexpr auto find(char c) noexcept
 	{
 		for(auto it = begin(); it != end(); ++it)
 		{
@@ -97,7 +108,65 @@ public:
 				return it; 
 			}
 		}
-		return end();
+		return end();	
+	}
+	
+	constexpr auto find(char c) const noexcept
+	{
+		for(auto it = cbegin(); it != cend(); ++it)
+		{
+			if(*it == c)
+			{
+				return it; 
+			}
+		}
+		return cend();
+	}
+	
+	constexpr auto findLastOf(char c) noexcept
+	{
+		for(auto it = rbegin(); it != rend(); ++it)
+		{
+			if(*it == c)
+			{
+				return it;
+			}
+		}
+		return rend();
+	}
+	
+	constexpr auto findLastOf(char c) const noexcept
+	{
+		for(auto it = crbegin(); it != crend(); ++it)
+		{
+			if(*it == c)
+			{
+				return it;
+			}
+		}
+		return crend();
+	}
+	
+	constexpr StaticString trim() const noexcept
+	{
+		return StaticString{range<StaticString::const_iterator>{this->begin(), this->find(' ')}};
+	}
+	
+	StaticString& trim() noexcept
+	{
+		for(auto it = rbegin(); it != rend(); ++it)
+		{
+			if(*it == ' ')
+			{
+				*it = '\0';
+				--actualSize_;
+			}
+			else
+			{ 
+				return *this;
+			}
+		}
+		return *this;
 	}
 
 	constexpr operator const char*() const noexcept

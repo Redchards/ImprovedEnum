@@ -47,7 +47,7 @@ protected:
 		using difference = ptrdiff_t;
 		
 	protected:
-		constexpr BaseIterator(const ArrayClass& rhs, IndexType index) : it_(rhs), index_(index) {}
+		constexpr BaseIterator(ArrayClassRef rhs, IndexType index) : it_(rhs), index_(index) {}
 
 	public:
 		constexpr BaseIterator() = delete;
@@ -190,11 +190,20 @@ protected:
 			return *this;
 		}
 		
-		constexpr typename std::remove_cv<value_type>::type operator*() const 
+		constexpr auto& operator*()
 		{ 
 			return this->it_[this->index_]; 
 		}
-		constexpr pointer operator->() const 
+		constexpr auto operator->()
+		{ 
+			return &(this->it_[this->index_]); 
+		}
+		
+		constexpr auto& operator*() const 
+		{ 
+			return this->it_[this->index_]; 
+		}
+		constexpr auto operator->() const 
 		{ 
 			return &(this->it_[this->index_]); 
 		}
@@ -314,12 +323,21 @@ protected:
 			return *this;
 		}
 		
-		constexpr typename std::remove_cv<typename BaseIterator<constFlag>::value_type>::type operator*() const 
+		constexpr auto& operator*()
 		{ 
 			return this->it_[this->index_ - 1]; 
 		}
-		constexpr typename BaseIterator<constFlag>::pointer operator->() const 
+		constexpr auto operator->()
+		{
+			return &this->it_[this->index_ - 1];
+		}
+		
+		constexpr auto& operator*() const
 		{ 
+			return this->it_[this->index_ - 1]; 
+		}
+		constexpr auto operator->() const
+		{
 			return &this->it_[this->index_ - 1];
 		}
 		

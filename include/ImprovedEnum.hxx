@@ -12,6 +12,8 @@
 #include <StaticString.hxx>
 #include <Range.hxx>
 
+#define TRIM_ENUM_NAME
+
 // Would be better to replace the specialization method by a thing like
 // "is_in_list", and a typelist.
 
@@ -73,8 +75,13 @@ namespace Details
 
 namespace Details
 {
+/* Usually, returning by const value is pretty useless, but here, it's used to indicate to the compiler that we want to call
+ * the const version of our 'trim()' function later.
+ * Without the qualifier, the compiler wants to call the other StaticString<TSize>:trim(), which is not constexpr, because of
+ * the modifications inside the function.
+ */
 template<size_t Tsize>
-constexpr StaticString<Tsize> stringifyEnumInitializerHelper(ConstString str) noexcept
+constexpr const StaticString<Tsize> stringifyEnumInitializerHelper(ConstString str) noexcept
 {
     return { range<ConstString::const_iterator>{str.begin(), str.find('=')} };
 }
@@ -82,23 +89,27 @@ constexpr StaticString<Tsize> stringifyEnumInitializerHelper(ConstString str) no
 
 #define STRINGIFY_ENUM_EQUAL_RANGE(string, stringType) range<stringType::const_iterator>{stringType{string}.begin(), stringType{string}.find('=')}
 #define STRINGIFY_ENUM_HELPER(string, stringType) stringType{STRINGIFY_ENUM_EQUAL_RANGE(string, stringType)}
+#ifdef TRIM_ENUM_NAME
+#define STRINGIFY_ENUM(x, next) Details::stringifyEnumInitializerHelper<ConstString{STRINGIFY(x)}.size()>(STRINGIFY(x)).trim() IF(next)(ADD_COMMA, EMPTY_ACTION)()
+#else
 #define STRINGIFY_ENUM(x, next) Details::stringifyEnumInitializerHelper<ConstString{STRINGIFY(x)}.size()>(STRINGIFY(x)) IF(next)(ADD_COMMA, EMPTY_ACTION)()
-//#define STRINGIFY_ENUM(x, next) STRINGIFY(x) IF(next)(ADD_COMMA, EMPTY_ACTION)()
+#endif
 #define ENUM_NAME_TUPLE_DECL(x, next) StaticString<ConstString{STRINGIFY(x)}.size()> IF(next)(ADD_COMMA, EMPTY_ACTION)()
 
 namespace EnumUtils
 {
 
-// Idea : could deducd the size by using the EnumName::tupleType size, instead of the VA_ARGS_COUNT macro.
-// Would reduce the time taken to build the enum, even if it's not really an issue right now.
+/* Idea : could deducd the size by using the EnumName::tupleType size, instead of the VA_ARGS_COUNT macro.
+ * Would reduce the time taken to build the enum, even if it's not really an issue right now.
+ */
 
-// Very verbose iterator implementation. Unfortunatly, this is cause by the lack of constexpr qualifier in the implementation
-// of the std::reverse_iterator. Fortunatly this time, this may change, as per the following proposal :
-// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0031r0.html
-// Let's hope this got accepted in the next standard, this would cut a lot of verbose in this code.
+/* http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0031r0.html
+ * Let's hope this got accepted in the next standard, this would cut a lot of verbose in this code.
+ */
 
-// NOTE : The operator-> reintepret_cast is safe, as the class EnumName will contain only a EnumName::Internal##EnumName value anyway.
-// The other members are static constexpr variables, or member functions.
+/* NOTE : The operator-> reintepret_cast is safe, as the class EnumName will contain only a EnumName::Internal##EnumName value anyway.
+ * The other members are static constexpr variables, or member functions.
+ */
 
 enum class EnumIteratorTag : uint8_t
 {

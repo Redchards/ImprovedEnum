@@ -49,12 +49,12 @@ public:
 	constexpr const_reverse_iterator rend() const noexcept { return begin(); }
 	constexpr const_reverse_iterator crend() const noexcept { return begin(); }
 
-	constexpr char at(size_t index) const
+	constexpr const char& at(size_t index) const
 	{
 		return (index < size_ ? cstr_[index] : throw std::out_of_range("Attempt to access a non-existing index of a constant string"));
 	}
 
-	constexpr char operator[](size_t index) const
+	constexpr const char& operator[](size_t index) const
 	{
 		return at(index);
 	}

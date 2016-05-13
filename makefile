@@ -350,7 +350,8 @@ CXXFLAGS:=$(CXXFLAGS)
 # .PRECIOUS objects.
 .PRECIOUS: %.(CXXEXT) %.(CEXT) %.(ASMEXT) %.(OBJEXT)
 
-.SILENT: .SECONDARY
+
+# .SILENT: .SECONDARY
 
 # Rule "all". All other first rules depends on it.
 all: build-info $(OUTPATH)/$(EXEC)
@@ -360,7 +361,7 @@ all: build-info $(OUTPATH)/$(EXEC)
 #test: $(OUTPATH)/$(TESTDIR)/$(EXEC)
 #	@ printf $INCLDIR
 
-test: $(OBJS) $(TESTS) build-info
+test: build-info $(OBJS) $(TESTS)
 	@$(if $(OK),printf "Built : $(addprefix - \e[1m\e[32m,$(addsuffix \n,$(notdir $(filter $?, $(TESTS)))))\e[0mSee the result in the following directory : \e[1m\e[96m$(OUTPATH)/$(TESTDIR)\e[0m\n",\
 				printf "\e[1m\e[32mNothing to do, everything is up to date !\e[0m\n\n")
 
