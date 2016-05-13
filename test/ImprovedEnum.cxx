@@ -341,7 +341,7 @@ auto improvedEnumTestCode()
 			size_t i = 4;
 			for(auto val : EnumName::iterableFrom(EnumName::Test5))
 			{
-				expect(val.toString(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
+				expect(val.toString(), equal_to(std::string{"Test"} + std::to_string(i + 2)));
 				++i;
 			}
 		});

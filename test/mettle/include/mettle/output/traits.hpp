@@ -17,12 +17,13 @@ namespace detail {
 }
 
 template<typename T>
-struct is_printable : decltype(detail::check_printable<T>(0)) {};
+struct is_printable : std::integral_constant<bool, decltype(detail::check_printable<T>(0))::value || std::is_convertible<T, const char*>::value> {};
 
 template<typename T>
 struct is_boolish : std::integral_constant<bool,
-  std::is_same<typename std::remove_cv<T>::type, bool>::value ||
-  (std::is_convertible<T, bool>::value && !std::is_arithmetic<T>::value)
+  (std::is_same<typename std::remove_cv<T>::type, bool>::value ||
+  (std::is_convertible<T, bool>::value && !std::is_arithmetic<T>::value))
+  && !std::is_pointer<T>::value && !std::is_convertible<T, const char*>::value
 > {};
 
 template<typename T>

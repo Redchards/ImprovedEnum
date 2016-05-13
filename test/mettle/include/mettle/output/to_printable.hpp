@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <locale>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -61,6 +62,14 @@ template<typename Char, typename Traits>
 inline std::string
 to_printable(const METTLE_STRING_VIEW<Char, Traits> &s) {
   return escape_string(string_convert(s));
+}
+
+template<typename TString,
+         std::enable_if_t<std::is_convertible<TString, const char*>::value>* = nullptr>
+inline std::string
+to_printable(TString&& str)
+{
+  return escape_string(string_convert(static_cast<const char*>(str)));
 }
 
 inline std::string to_printable(char c) {
@@ -152,6 +161,7 @@ template<typename T>
 auto to_printable_boolish(const T &t) -> typename std::enable_if<
   !std::is_scalar<typename std::remove_reference<T>::type>::value, std::string
 >::type {
+  //std::cout <<"HHHHHHHHHHHHHH"<<std::endl;
   return type_name(t);
 }
 
@@ -182,6 +192,7 @@ auto to_printable(const T &t) -> typename std::enable_if<
   !is_exception<T>::value && !is_iterable<T>::value,
   std::string
 >::type {
+  std::cout << "Bouh : " << std::is_convertible<T, const char*>::value << std::endl;
   return type_name(t);
 }
 
