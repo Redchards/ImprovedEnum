@@ -20,8 +20,10 @@ The tests will then be found under the bin/$(platform)/$(configuration)/test fol
 The testing framework used is [mettle](https://github.com/jimporter/mettle), a nice little unit testing framework using C++14.
 
 Writing code using this library is pretty straightforward. First of all, choose one of the two macro used to generate enumerations :
-```ITERATABLE_ENUM(EnumName, underlyingType, ...)
-IMPROVED_ENUM(EnumName, underlyingType, ...)```
+```
+ITERATABLE_ENUM(EnumName, underlyingType, ...)
+IMPROVED_ENUM(EnumName, underlyingType, ...)
+```
 
 Be aware that, while it can be more convenient, the IMPROVED_ENUM macro may take a slighty longer time to generate, due to the fact that it need to generate names in addition to all the other code to take care about iteration and such. The difference should be in many case, however, negligible. In the following examples, we will use IMPROVED_ENUM, but the declaration of the enum using ITERATABLE_ENUM is strictly the same.
 
