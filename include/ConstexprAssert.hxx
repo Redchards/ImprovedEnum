@@ -18,10 +18,10 @@
  * https://www.google.fr/url?sa=t&rct=j&q=&esrc=s&source=web&cd=2&ved=0ahUKEwin9ZDnwMvMAhWJA8AKHc7fDJ0QFggmMAE&url=http%3A%2F%2Fwww.open-std.org%2Fjtc1%2Fsc22%2Fwg21%2Fdocs%2Fpapers%2F2014%2Fn4293.pdf&usg=AFQjCNHRfOCc2KsD16oCJWg6KK3pClTp1Q&sig2=Rt6qGhRRtCW76YhxaturVQ
  */
 
-#define CONSTEXPR_ASSERT(condition, msg) condition ? \
-										 int{} : \
-										 throw Details::ConstexprAssertFailure([](const char* assertMsg){ \
-										     std::fprintf(stderr, "Assertion failure: %s\n", assertMsg); assert(!#condition); \
+#define CONSTEXPR_ASSERT(condition, msg) condition ? 																			\
+										 int{} : 																				\
+										 throw Details::ConstexprAssertFailure([](const char* assertMsg) { 						\
+										     std::fprintf(stderr, "Assertion failure: %s\n", assertMsg); assert(!#condition); 	\
 										 }, msg)
 
 namespace Details
