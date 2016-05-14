@@ -55,7 +55,8 @@ public:
 
 	constexpr const char& at(size_t index) const
 	{
-		return (index < size_ ? cstr_[index] : throw std::out_of_range("Attempt to access a non-existing index of a constant string"));
+		CONSTEXPR_ASSERT(index < size_, "Attempt to access a non-existing index of a constant string");
+		return cstr_[index];
 	}
 
 	constexpr const char& operator[](size_t index) const
