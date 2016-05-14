@@ -10,7 +10,6 @@
 #include <ArrayIteratorPolicy.hxx>
 #include <MetaUtils.hxx>
 #include <Range.hxx>
-#include <StaticString.hxx>
 #include <StringDetails.hxx>
 
 class ConstString

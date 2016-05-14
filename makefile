@@ -365,7 +365,7 @@ all: build-info $(OUTPATH)/$(EXEC)
 #	@ printf $INCLDIR
 
 test: build-info $(OBJS) $(TESTS)
-	@$(if $(OK),printf "Built : $(addprefix - \e[1m\e[32m,$(addsuffix \n,$(notdir $(filter $?, $(TESTS)))))\e[0mSee the result in the following directory : \e[1m\e[96m$(OUTPATH)/$(TESTDIR)\e[0m\n",\
+	@$(if $(OK),printf "Built tests : \n $(addsuffix \e[0m, $(addprefix - \e[1m\e[32m,$(addsuffix \n,$(notdir $(filter $?, $(TESTS)))))) See the result in the following directory : \e[1m\e[96m$(OUTPATH)/$(TESTDIR)\e[0m\n",\
 				printf "\e[1m\e[32mNothing to do, everything is up to date !\e[0m\n\n")
 
 # If the first option is not clean, we call the "all" rule.
