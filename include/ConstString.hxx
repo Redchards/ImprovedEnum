@@ -1,6 +1,10 @@
 #ifndef CONST_STRING_HXX
 #define CONST_STRING_HXX
 
+// Workaround for clang to work with libstdc++
+#include <stddef.h>
+using max_align_t = size_t;
+
 #include <algorithm>
 #include <cstddef>
 #include <stdexcept>
