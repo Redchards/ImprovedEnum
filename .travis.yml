@@ -2,7 +2,7 @@ compiler :
  - clang++-3.6
  - clang++-3.7
 language : cpp
-script : make test FLAGS+=-stdlib=libstdc++
+script : make test FLAGS+=-stdlib=libstdc++ VERBOSE=some
 
 addons:
   apt:
