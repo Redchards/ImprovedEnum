@@ -16,4 +16,4 @@ addons:
     - clang-3.7
     
 cache:
-    apt: true
+    - apt
