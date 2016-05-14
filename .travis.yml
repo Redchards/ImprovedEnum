@@ -2,7 +2,7 @@ compiler :
  - clang++-3.6
  - clang++-3.7
 language : cpp
-script : make test FLAGS+=-stdlib=libstdc++-4.9 VERBOSE=some
+script : make test FLAGS+=-stdlib=libstdc++ VERBOSE=some
 
 addons:
   apt:
@@ -11,6 +11,9 @@ addons:
     - llvm-toolchain-precise-3.6
     - llvm-toolchain-precise-3.7
     packages:
-    - libstdc++-4.9-dev
+    - g++-5
     - clang-3.6
     - clang-3.7
+    
+cache:
+    apt: true
