@@ -107,7 +107,7 @@ TESTFRAMEWORK=mettle
 FLAGS:= -W -Wall -Wextra
 CFLAGS= $(FLAGS) -std=c11
 #$(error cxxflags are $(D) and flags are $(FLAGS))
-CXXFLAGS= $(FLAGS) -std=c++1y -stdlib=libstdc++
+CXXFLAGS= $(FLAGS) -std=c++1y
 
 # Flags used only for debug mod
 DEBUGFLAGS:= -g -O0 $(DEBUGFLAGS)

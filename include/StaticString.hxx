@@ -32,11 +32,17 @@ public:
 	// Serve for the sole purpose of begin able to be literal type even with default constructor
 	constexpr StaticString() : str_{}
 	{}
+	constexpr StaticString(const StaticString& other) : str_{other.str_}, actualSize_{Tsize}
+	{
+		//static_assert(otherSize <= Tsize, "The string used to initialize the StaticString do not fit !");
+	}
+	
 	template<size_t otherSize>
 	constexpr StaticString(const StaticString<otherSize>& other) : str_{other.str_}, actualSize_{otherSize}
 	{
 		static_assert(otherSize <= Tsize, "The string used to initialize the StaticString do not fit !");
 	}
+	
 	template<size_t otherSize>
 	constexpr StaticString(const char(&cstr)[otherSize]) : str_{initStr<otherSize - 1>(ConstString{cstr})}, actualSize_{otherSize - 1}
 	{
@@ -52,6 +58,13 @@ public:
 	{
 		CONSTEXPR_ASSERT(range.size() <= Tsize, "Range do not fit in the StaticString !");
 	}
+	
+	// Slow version to compile on libc++ which seems buggy on my archlinux.
+	/*template<class TString>
+	constexpr StaticString(TString&& str) : StaticString{range<typename TString::const_iterator>{str.begin(), str.end()}}
+	{
+		//CONSTEXPR_ASSERT(str.size() <= Tsize, "The string used to initialize the StaticString do not fit !");
+	}*/
 	
 	constexpr iterator begin() noexcept { return{ *this, 0 }; }
 	constexpr const_iterator begin() const noexcept { return{ *this, 0 }; }
