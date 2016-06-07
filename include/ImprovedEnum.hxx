@@ -173,13 +173,22 @@ class EnumName                                                                  
     using const_iterator = iterator;                                                                                            \
     using reverse_iterator = EnumUtils::EnumIterator<EnumName, EnumUtils::EnumIteratorTag::Reversed>;                           \
     using const_reverse_iterator = reverse_iterator;                                                                            \
+    using underlying_type = underlyingType;                                                                                     \
+    using UnderlyingEnumType = Internal##EnumName;                                                                              \
     using TupleType = std::tuple<MAP2(ENUM_NAME_TUPLE_DECL, __VA_ARGS__)>;                                                      \
                                                                                                                                 \
     public:                                                                                                                     \
-    constexpr EnumName(Internal##EnumName value) noexcept : value_{value} {}                                                    \
     constexpr EnumName(const EnumName& other) noexcept : value_{other.value_} {}                                                \
-    constexpr EnumName operator=(Internal##EnumName value) noexcept { value_ = value; return *this; }                           \
+    constexpr EnumName(Internal##EnumName value) noexcept : value_{value} {}                                                    \
     constexpr EnumName operator=(const EnumName& other) noexcept { value_ = other.value_; return *this; }                       \
+    constexpr EnumName operator=(Internal##EnumName value) noexcept { value_ = value; return *this; }                           \
+                                                                                                                                \
+    constexpr bool operator==(EnumName other) const noexcept { return value_ == other.value_; }                                 \
+    constexpr bool operator!=(EnumName other) const noexcept { return !(*this == other); }                                      \
+    constexpr bool operator<(EnumName other) const noexcept { return value_ < other.value_; }                                   \
+    constexpr bool operator>=(EnumName other) const noexcept { return !(*this < other); }                                       \
+    constexpr bool operator>(EnumName other) const noexcept { return value_ > other.value_; }                                   \
+    constexpr bool operator<=(EnumName other) const noexcept { return !(*this > other); }                                       \
                                                                                                                                 \
     constexpr underlyingType toUnderlying() const noexcept                                                                      \
     {                                                                                                                           \
@@ -271,13 +280,22 @@ class EnumName                                                                  
     using const_iterator = iterator;                                                                                            \
     using reverse_iterator = EnumUtils::EnumIterator<EnumName, EnumUtils::EnumIteratorTag::Reversed>;                           \
     using const_reverse_iterator = reverse_iterator;                                                                            \
+    using underlying_type = underlyingType;                                                                                     \
+    using UnderlyingEnumType = Internal##EnumName;                                                                              \
     using TupleType = std::tuple<MAP2(ENUM_NAME_TUPLE_DECL, __VA_ARGS__)>;                                                      \
                                                                                                                                 \
     public:                                                                                                                     \
-    constexpr EnumName(Internal##EnumName value) noexcept : value_{value} {}                                                    \
     constexpr EnumName(const EnumName& other) noexcept : value_{other.value_} {}                                                \
-    constexpr EnumName operator=(Internal##EnumName value) noexcept { value_ = value; return *this; }                           \
+    constexpr EnumName(Internal##EnumName value) noexcept : value_{value} {}                                                    \
     constexpr EnumName operator=(const EnumName& other) noexcept { value_ = other.value_; return *this; }                       \
+    constexpr EnumName operator=(Internal##EnumName value) noexcept { value_ = value; return *this; }                           \
+                                                                                                                                \
+    constexpr bool operator==(EnumName other) const noexcept { return value_ == other.value_; }                                 \
+    constexpr bool operator!=(EnumName other) const noexcept { return !(*this == other); }                                      \
+    constexpr bool operator<(EnumName other) const noexcept { return value_ < other.value_; }                                   \
+    constexpr bool operator>=(EnumName other) const noexcept { return !(*this < other); }                                       \
+    constexpr bool operator>(EnumName other) const noexcept { return value_ > other.value_; }                                   \
+    constexpr bool operator<=(EnumName other) const noexcept { return !(*this > other); }                                       \
                                                                                                                                 \
     constexpr underlyingType toUnderlying() const noexcept                                                                      \
     {                                                                                                                           \
