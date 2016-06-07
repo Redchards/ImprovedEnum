@@ -8,14 +8,15 @@
 */
 ///@note Early version, do not rely on it too much !
 
-#define GCC_COMPILER     1
-#define MVSC_COMPILER    2
-#define ICC_COMPILER     3
-#define BORLAND_COMPILER 4
+#define CLANG_COMPILER   1
+#define GCC_COMPILER     2
+#define MSVC_COMPILER    3
+#define ICC_COMPILER     4
+#define BORLAND_COMPILER 5
 
 #define LINUX   1
 #define WINDOWS 2
-#define MAC     3
+#define MACOSX  3
 
 #define UNKOWN "unknown"
 
@@ -27,13 +28,43 @@
              If your compiler support C++11, please turn C++11 support option on !"
 #endif
 
-
-#if defined( __GNUC__ ) || defined( __MINGW__ ) || defined ( __clang__ )
+#if defined( __clang__ ) || defined( __llvm__ )
+#   define FUNCTION __PRETTY_FUNCTION__
+#   define restrict __restrict__
+#   if __has_attribute(always_inline)
+#       define force_inline __atribute__((always_inline))
+#   endif
+#   if __has_builtin(__builtin_expect)
+#       define likely(x)    __builtin_expect((x), 1)
+#       define unlikely(x)  __builtin_expect((x), 0)
+#   endif
+#   define COMPILER CLANG_COMPILER
+#   if defined( __clang_patchlevel__ )
+#       define COMPILER_VERSION ( __clang_major__ * 10000 \
+                                + __clang_minor__ * 100   \
+                                + __clang_patchlevel__ )
+#   else
+#       define COMPILER_VERSION ( __clang_major * 10000  \
+                                + __clang_minor * 100)
+#   endif
+#   if __has_extension(attribute_deprecated_with_message)
+#       define DEPRECATED(msg) __attribute((deprecated(msg)))
+#   elif __has_attribute(deprecated)
+#       define DEPRECATED(msg) __attribute((deprecated))
+#   endif
+#   if __has_feature(cxx_override_control)
+#       define override override
+#       define final final
+#   endif
+#   if __has_attribute(naked)
+#       define naked __attribute__((naked)) 
+#   endif
+#elif defined( __GNUC__ ) || defined( __MINGW__ )
 #   define FUNCTION __PRETTY_FUNCTION__
 #	define restrict __restrict__
 #	define force_inline __attribute__((always_inline))
-#	define likely(x)       __builtin_expect((x),1)
-#	define unlikely(x)     __builtin_expect((x),0)
+#	define likely(x)    __builtin_expect((x),1)
+#	define unlikely(x)  __builtin_expect((x),0)
 #   if defined( __MINGW__ )
 #       define COMPILER_NAME "MinGW"
 #   else
@@ -41,23 +72,23 @@
 #   endif
 #   define COMPILER GCC_COMPILER
 #   if defined( __GNUC_PATCHLEVEL__ )
-#       define COMPILER_VERSION ( __GNUC__ * 10000 \
-                                     + __GNUC_MINOR__ * 100 \
-                                     + __GNUC_PATCHLEVEL__ )
+#       define COMPILER_VERSION ( __GNUC__ * 10000     \
+                                + __GNUC_MINOR__ * 100 \
+                                + __GNUC_PATCHLEVEL__ )
 #   else
 #       define COMPILER_VERSION ( __GNUC__ * 10000 \
-                                     + __GNUC__ * 100 )
+                                + __GNUC__ * 100 )
 #   endif
 #   if( COMPILER_VERSION < 40500 )
 #       define DEPRECATED(msg) __attribute__((deprecated))
 #   else
 #       define DEPRECATED(msg) __attribute__((deprecated(msg)))
 #	endif
-#	if(( COMPILER_VERSION >= 40700 ) || defined(__clang__))
+#	if( COMPILER_VERSION >= 40700 )
 #		define override override
 #		define final final
 #   endif
-#   define naked __attribute__((naked))
+#   define naked __attribute__((naked)) 
 #elif defined( _MSC_VER )
 #   define FUNCTION __FUNCSIG__
 #	define restrict __declspec(restrict)
@@ -65,7 +96,7 @@
 #	define likely(x)
 #	define unlikely(x)
 #   define COMPILE_NAME "Microsoft compiler"
-#   define COMPILER MVSC_COMPILER
+#   define COMPILER MSVC_COMPILER
 #   if( ( _MSC_VER <= 1200 ) )
 #       define COMPILER_VERSION _MSC_VER
 #   else
@@ -105,25 +136,58 @@
 #   endif
 #	define restrict
 #	define always_inline
-#   define COMPILER_NAME UNKNWON
+#   define COMPILER_NAME "UNKNWON"
 #   define COMPILER UNKNOWN
 #   define COMPILER_VERSION UNKNOWN
 #   warning "Compiler not recongnized, results may be unexpected"
 #   define DEPRECATED(t)
 #endif
 
-#if (!defined override && !defined final)
+#if !defined( restrict )
+#   define restrict
+#   warning "The 'restrict' keyword is not supported. The feature 'restrict' will be disabled, and the keyword will have no effect".
+#endif
+
+#if !defined( override ) && !defined( final )
 #	define override
 #	define final
-#	warning "Keyword override and final are not defined by your compiler. This may lead to wrong result when using API. Please change your compiler to a supported compiler !"
+#	warning The 'final' and 'override' keywords are not supported. They are disabled, and will have no effect if used !
+#elif !defined( override )
+#   define override
+#   warning The 'override' keyword is not supported. It is disabled, and will have no effect if used !
+#elif !defined( final )
+#   define final
+#   warning The 'final' keyword is not supported. It is disabled, and will have no effect if used !
+#endif
+
+#if !defined( naked )
+#   define naked
+#   warning Keyword 'naked' is not defined by your compiler. The keyword is disabled, and will have no effect if used !
+#endif
+
+#if !defined( force_inline )
+#   define force_inline
+#   warning The 'force_inline' specifier is not supported. It is disabled, and will have no effect if used !
+#endif
+
+/* Assume if one of those is not defined, the other must not be so */
+#if !defined( likely ) || !defined( unlikely )
+#   define likely(x)
+#   define unlikely(x)
+#   warning The 'likely' and 'unlikely' features are note supported. They are disabled, and there use will have no effect if used !
+#endif
+
+#if !defined( DEPRECATED )
+#   define DEPRECATED(msg)
+#   warning The deprecated attribute is not supported. Depreciation report is disabled. You should see the documentation to avoid using deprecated functions !
 #endif
 
 #if defined( __gnu_linux__ ) || defined( __linux__ )
 #   define OS_NAME "Linux"
 #   define OS LINUX
 #elif defined( macintosh ) || defined( Macintosh ) || ( defined( __APPLE__ ) && defined( __MACH__ ) )
-#   define OS_NAME "Mac"
-#   define OS MAC
+#   define OS_NAME "MacOSX"
+#   define OS MACOSX
 #elif defined( _WIN32 )
 #   define OS_NAME "Windows"
 #   define OS WINDOWS
@@ -133,7 +197,7 @@
 #   warning "Operating system not recognized. Unexpected results might happen"
 #endif
 
-#if( OS == LINUX || OS == MAC ) && \
+#if( OS == LINUX || OS == MACOSX ) && \
     COMPILER_VERSION >= 4000 && \
     ( COMPILER == ICC_COMPILER || COMPILER == GCC_COMPILER )
 #       define EXPORT __attribute__( ( visibility( "default" ) ) )
