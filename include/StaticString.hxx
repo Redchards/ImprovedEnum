@@ -30,7 +30,7 @@ public:
 	
 public:
 	// Serve for the sole purpose of begin able to be literal type even with default constructor
-	constexpr StaticString() : str_{}
+	constexpr StaticString() : str_{}, actualSize_{}
 	{}
 	constexpr StaticString(const StaticString& other) : str_{other.str_}, actualSize_{Tsize}
 	{
@@ -115,6 +115,13 @@ public:
 		return &str_[0];
 	}
 	
+	constexpr void resize(size_t newSize) noexcept
+	{
+		CONSTEXPR_ASSERT(newSize <= Tsize, "Cannot resize a StaticString past it's maximum size");
+		
+		actualSize_ = newSize;
+	}
+	
 	constexpr auto find(char c) noexcept
 	{
 		for(auto it = begin(); it != end(); ++it)
@@ -190,8 +197,17 @@ public:
 		return data();
 	}
 	
+	/*template<size_t TSize1, size_t TSize2>
+	friend constexpr bool operator==(const StaticString<TSize1>& lhs, const StaticString<TSize2>& rhs);
+	
 	template<size_t TSize1, size_t TSize2>
-	friend constexpr bool operator==(StaticString<TSize1>& lhs, StaticString<TSize2> rhs);
+	friend constexpr bool operator!=(const StaticString<TSize1>& lhs, const StaticString<TSize2>& rhs);
+	
+	template<size_t otherSize>
+	friend constexpr bool operator==(const StaticString<otherSize>& lhs, ConstString rhs);
+	
+	template<size_t otherSize>
+	friend constexpr bool operator==(ConstString lhs, const StaticString<otherSize>& rhs);*/
 	
 	/* Alternative definition, working on GCC 5.2.0 and Clang 3.6
 	
@@ -217,11 +233,15 @@ public:
 	constexpr size_t size() const noexcept { return actualSize_; }
 
 private:
-	template<class Iterator>
+	/* 
+	 * Using this helper class for initialization causes GCC to freak out and see 'non constant expression' everywhere.
+	 * So not using it make up for a slightly uglier but working code on GCC
+	 */
+	/* template<class Iterator>
 	class RangeInitializationHelper
 	{
 		public:
-		constexpr RangeInitializationHelper(const range<Iterator> range) noexcept : range_{range}
+		constexpr RangeInitializationHelper(const range<Iterator>& range) noexcept : range_{range}
 		{}
 		constexpr char operator[](size_t index) const noexcept
 		{
@@ -229,8 +249,8 @@ private:
 		}
 		
 		private:
-		const range<Iterator> range_;	
-	};
+		const range<Iterator>& range_;	
+	}; */
 
 	template<size_t size>
 	constexpr std::array<char, Tsize + 1> initStr(ConstString cstr) const noexcept
@@ -239,10 +259,10 @@ private:
 	}
 	
 	template<class Iterator, size_t size>
-	constexpr std::array<char, Tsize + 1> initStrRange(const range<Iterator> range) const noexcept
+	constexpr std::array<char, Tsize + 1> initStrRange(const range<Iterator>& range) const noexcept
 	{
 		using IteratorType = std::conditional_t<Meta::is_iterator_of<StaticString, Iterator>::value, unchecked_const_iterator, Iterator>;
-		return initStrRangeAux(RangeInitializationHelper<IteratorType>{range}, std::make_integer_sequence<size_t, size>{});
+		return initStrRangeAux(range, std::make_integer_sequence<size_t, size>{});
 	}
 	
 	template<size_t ... indices>
@@ -252,9 +272,9 @@ private:
 	}
 	
 	template<class Iterator, size_t ... indices>
-	constexpr std::array<char, Tsize + 1> initStrRangeAux(RangeInitializationHelper<Iterator> helper, std::integer_sequence<size_t, indices...>) const noexcept
+	constexpr std::array<char, Tsize + 1> initStrRangeAux(const range<Iterator>& range, std::integer_sequence<size_t, indices...>) const noexcept
 	{
-		return {{helper[indices]...}};
+		return {{((range.begin() + indices) < range.end() ? *(range.begin() + indices) : '\0')...}};
 	}
 
 	std::array<char, Tsize + 1> str_;
@@ -265,6 +285,61 @@ template<size_t TSize1, size_t TSize2>
 constexpr bool operator==(StaticString<TSize1>& lhs, StaticString<TSize2> rhs)
 {
 	return lhs.size() != rhs.size() ? false : Details::equalAux(lhs.size(), lhs, rhs);
+}
+
+template<size_t TSize1, size_t TSize2>
+constexpr bool operator!=(StaticString<TSize1>& lhs, StaticString<TSize2> rhs)
+{
+	return !(lhs == rhs);
+}
+
+template<size_t TSize1, size_t TSize2>
+constexpr bool operator==(const StaticString<TSize1>& lhs, const char (&rhs)[TSize2])
+{
+	ConstString tmp{rhs};
+	return lhs.size() != tmp.size() ? false : Details::equalAux(lhs.size(), lhs, tmp);
+}
+	
+template<size_t TSize1, size_t TSize2>
+constexpr bool operator==(const char (&lhs)[TSize1], const StaticString<TSize2>& rhs)
+{
+	return rhs == lhs;
+}
+
+template<size_t TSize1, size_t TSize2>
+constexpr bool operator!=(const char (&lhs)[TSize1], const StaticString<TSize2>& rhs)
+{
+	return !(rhs == lhs);
+}
+
+template<size_t TSize1, size_t TSize2>
+constexpr bool operator!=(const StaticString<TSize1>& lhs, const char (&rhs)[TSize2])
+{
+	return !(rhs == lhs);
+}
+
+template<size_t TSize>
+constexpr bool operator==(const StaticString<TSize>& rhs, ConstString lhs)
+{
+	return lhs.size() != rhs.size() ? false : Details::equalAux(lhs.size(), lhs, rhs);
+}
+	
+template<size_t TSize>
+constexpr bool operator==(ConstString lhs, const StaticString<TSize>& rhs)
+{
+	return rhs == lhs;
+}
+
+template<size_t TSize>
+constexpr bool operator!=(const StaticString<TSize>& lhs, ConstString rhs)
+{
+	return !(lhs == rhs);
+}
+	
+template<size_t TSize>
+constexpr bool operator!=(ConstString lhs, const StaticString<TSize>& rhs)
+{
+	return !(rhs == lhs);
 }
 
 #endif // STATIC_STRING_HXX

@@ -85,6 +85,7 @@ constexpr const StaticString<Tsize> stringifyEnumInitializerHelper(ConstString s
 {
     return {str.begin(), str.find('=')};
 }
+
 }
 
 //#define STRINGIFY_ENUM_EQUAL_RANGE(string, stringType) range<stringType::const_iterator>{stringType{string}.begin(), stringType{string}.find('=')}
@@ -178,6 +179,7 @@ class EnumName                                                                  
     using TupleType = std::tuple<MAP2(ENUM_NAME_TUPLE_DECL, __VA_ARGS__)>;                                                      \
                                                                                                                                 \
     public:                                                                                                                     \
+    constexpr EnumName() noexcept : value_{values[0]} {}                                                                        \
     constexpr EnumName(const EnumName& other) noexcept : value_{other.value_} {}                                                \
     constexpr EnumName(Internal##EnumName value) noexcept : value_{value} {}                                                    \
     constexpr EnumName operator=(const EnumName& other) noexcept { value_ = other.value_; return *this; }                       \
@@ -285,6 +287,7 @@ class EnumName                                                                  
     using TupleType = std::tuple<MAP2(ENUM_NAME_TUPLE_DECL, __VA_ARGS__)>;                                                      \
                                                                                                                                 \
     public:                                                                                                                     \
+    constexpr EnumName() noexcept : value_{values[0]} {}                                                                        \
     constexpr EnumName(const EnumName& other) noexcept : value_{other.value_} {}                                                \
     constexpr EnumName(Internal##EnumName value) noexcept : value_{value} {}                                                    \
     constexpr EnumName operator=(const EnumName& other) noexcept { value_ = other.value_; return *this; }                       \
