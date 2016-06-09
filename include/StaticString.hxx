@@ -7,8 +7,6 @@
 #include <Range.hxx>
 #include <StringDetails.hxx>
 
-// TODO : Allow range of different StaticString<size> (right know, only the same Tsize is allowed)
-
 template<size_t Tsize>
 class StaticString
 {
