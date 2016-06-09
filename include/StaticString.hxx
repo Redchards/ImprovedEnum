@@ -32,13 +32,13 @@ public:
 	// Serve for the sole purpose of begin able to be literal type even with default constructor
 	constexpr StaticString() : str_{}, actualSize_{}
 	{}
-	constexpr StaticString(const StaticString& other) : str_{other.str_}, actualSize_{Tsize}
+	constexpr StaticString(const StaticString& other) : str_{other.str_}, actualSize_{other.actualSize_}
 	{
 		//static_assert(otherSize <= Tsize, "The string used to initialize the StaticString do not fit !");
 	}
 	
 	template<size_t otherSize>
-	constexpr StaticString(const StaticString<otherSize>& other) : str_{other.str_}, actualSize_{otherSize}
+	constexpr StaticString(const StaticString<otherSize>& other) : str_{other.str_}, actualSize_{other.actualSize_}
 	{
 		static_assert(otherSize <= Tsize, "The string used to initialize the StaticString do not fit !");
 	}

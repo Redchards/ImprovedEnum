@@ -1,9 +1,7 @@
 #ifndef CONST_STRING_HXX
 #define CONST_STRING_HXX
 
-// Workaround for clang to work with libstdc++
 #include <stddef.h>
-using max_align_t = size_t;
 
 #include <algorithm>
 #include <cstddef>
@@ -14,7 +12,13 @@ using max_align_t = size_t;
 #include <ArrayIteratorPolicy.hxx>
 #include <MetaUtils.hxx>
 #include <Range.hxx>
+#include <Platform.hxx>
 #include <StringDetails.hxx>
+
+// Workaround for clang to work with libstdc++
+#if COMPILER == COMPILER_CLANG
+using max_align_t = size_t;
+#endif
 
 class ConstString
 {

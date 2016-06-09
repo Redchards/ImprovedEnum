@@ -20,7 +20,7 @@ namespace mettle {
 
 namespace detail {
   template<typename T>
-  constexpr T& max(const T& lhs, const T& rhs)
+  constexpr const T& max(const T& lhs, const T& rhs)
   {
     return lhs >= rhs ? lhs : rhs;
   }
