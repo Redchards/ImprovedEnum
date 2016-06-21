@@ -22,9 +22,9 @@ public:
 	using unchecked_reverse_iterator = typename IterPolicy::unchecked_reverse_iterator;
 	using unchecked_const_reverse_iterator = typename IterPolicy::unchecked_const_reverse_iterator;
 	
-	using value_type = const char;
-	using reference = const char&;
-	using pointer = const char*;
+	using value_type = char;
+	using reference = char&;
+	using pointer = char*;
 	
 public:
 	// Serve for the sole purpose of begin able to be literal type even with default constructor
@@ -259,7 +259,7 @@ private:
 	template<class Iterator, size_t size>
 	constexpr std::array<char, Tsize + 1> initStrRange(const range<Iterator>& range) const noexcept
 	{
-		using IteratorType = std::conditional_t<Meta::is_iterator_of<StaticString, Iterator>::value, unchecked_const_iterator, Iterator>;
+		//using IteratorType = std::conditional_t<Meta::is_iterator_of<StaticString, Iterator>::value, unchecked_const_iterator, Iterator>;
 		return initStrRangeAux(range, std::make_integer_sequence<size_t, size>{});
 	}
 	

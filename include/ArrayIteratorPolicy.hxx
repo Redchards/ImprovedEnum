@@ -190,20 +190,20 @@ protected:
 			return *this;
 		}
 		
-		constexpr auto& operator*()
+		constexpr reference operator*()
 		{ 
 			return this->it_[this->index_]; 
 		}
-		constexpr auto operator->()
+		constexpr pointer operator->()
 		{ 
 			return &(this->it_[this->index_]); 
 		}
 		
-		constexpr auto& operator*() const 
+		constexpr const auto& operator*() const 
 		{ 
 			return this->it_[this->index_]; 
 		}
-		constexpr auto operator->() const 
+		constexpr const auto* operator->() const 
 		{ 
 			return &(this->it_[this->index_]); 
 		}
@@ -323,23 +323,23 @@ protected:
 			return *this;
 		}
 		
-		constexpr auto& operator*()
+		constexpr reference operator*()
 		{ 
 			return this->it_[this->index_ - 1]; 
 		}
-		constexpr auto operator->()
+		constexpr pointer operator->()
 		{
-			return &this->it_[this->index_ - 1];
-		}
+			return &(this->it_[this->index_ - 1]);
+		}	
 		
-		constexpr auto& operator*() const
+		constexpr const auto& operator*() const
 		{ 
 			return this->it_[this->index_ - 1]; 
 		}
-		constexpr auto operator->() const
+		constexpr const auto* operator->() const
 		{
-			return &this->it_[this->index_ - 1];
-		}
+			return &(this->it_[this->index_ - 1]);
+		}	
 		
 		template<bool otherConstFlag>
 		constexpr bool operator<(const ReverseIterator<otherConstFlag>& rhs) const noexcept
