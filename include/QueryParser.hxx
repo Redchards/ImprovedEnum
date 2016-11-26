@@ -1,6 +1,0 @@
-#ifndef QUERY_PARSER_HXX
-#define QUERY_PARSER_HXX
-
-
-
-#endif // QUERY_PARSER_HXX
