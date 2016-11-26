@@ -145,6 +145,8 @@ struct reduced_pair
 
 }
 
+// TODO : Check if is const iterator. If yes, then mark "begin()" and "end()" const.
+
 template<class Iterator>
 struct range : private Details::reduced_pair<Iterator, Iterator>
 {

@@ -1,6 +1,8 @@
 #ifndef META_UTILS_HXX
 #define META_UTILS_HXX
 
+#include <Configuration.hxx>
+
 // Some metaprogramming utilities, reduced to the bare minimum for the library.
 
 namespace Meta
@@ -37,6 +39,12 @@ struct is_iterator_of<T, Iterator, void> : std::conditional_t<
 								||  is_unchecked_iterator_of<T, Iterator>::value,
 									std::true_type, std::false_type>
 {};
+
+template<size_type ... N>
+using index_sequence = std::integer_sequence<size_type, N...>;
+
+template<size_type N>
+using make_index_sequence = std::make_integer_sequence<size_type, N>;
 
 }
 
