@@ -441,9 +441,9 @@ class EnumName                                                                  
                                                                                                                                 \
     public:                                                                                                                     \
     using ValuesArrayType = std::array<Internal##EnumName, size_>;                                                              \
-    static constexpr const ValuesArrayType& values() noexcept { return values_; }\
-\
-    private:\
+    static constexpr const ValuesArrayType& values() noexcept { return values_; }                                               \
+                                                                                                                                \
+    private:                                                                                                                    \
     static constexpr ValuesArrayType values_{{MAP2(ENUM_ASSIGN_REMOVE(EnumName), __VA_ARGS__)}};                             	\
 };                                                                                                                              \
                                                                                                                                 \
