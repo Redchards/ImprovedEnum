@@ -68,10 +68,10 @@ namespace Details
     };
 }
 
-#define SANE_LIST_BUILDER_HELPER(x, next) x IF(next)(ADD_COMMA, EMPTY_ACTION)()
+#define SANE_LIST_BUILDER_HELPER(x, next) x IF(next)(ADD_COMMA)()
 #define ENUM_ASSIGN_REMOVE(type) (const Details::AssignmentRemover<type::Internal##type>)type::SANE_LIST_BUILDER_HELPER
 #define ENUM_UPWARD_CONV(type) (type) SANE_LIST_BUILDER_HELPER
-#define BRACE_ENCLOSE_INIT(x, next) {x} IF(next)(ADD_COMMA, EMPTY_ACTION)()
+#define BRACE_ENCLOSE_INIT(x, next) {x} IF(next)(ADD_COMMA)()
 
 namespace Details
 {
@@ -86,16 +86,22 @@ constexpr const StaticString<Tsize> stringifyEnumInitializerHelper(ConstString s
     return {str.begin(), str.find('=')};
 }
 
+template<size_t Tsize>
+constexpr const StaticString<Tsize> stringifyTrimEnumInitializerHelper(ConstString str) noexcept
+{
+    return stringifyEnumInitializerHelper<Tsize>(str).trim();
 }
 
-//#define STRINGIFY_ENUM_EQUAL_RANGE(string, stringType) range<stringType::const_iterator>{stringType{string}.begin(), stringType{string}.find('=')}
+}
+
 #define STRINGIFY_ENUM_HELPER(string, stringType) stringType{STRINGIFY_ENUM_EQUAL_RANGE(string, stringType)}
 #ifdef TRIM_ENUM_NAME
-#define STRINGIFY_ENUM(x, next) Details::stringifyEnumInitializerHelper<ConstString{STRINGIFY(x)}.size()>(STRINGIFY(x)).trim() IF(next)(ADD_COMMA, EMPTY_ACTION)()
+#define STRINGIZE_ENUM_ELEM_NAMES_FCT stringifyTrimEnumInitializerHelper
 #else
-#define STRINGIFY_ENUM(x, next) Details::stringifyEnumInitializerHelper<ConstString{STRINGIFY(x)}.size()>(STRINGIFY(x)) IF(next)(ADD_COMMA, EMPTY_ACTION)()
+#define STRINGIZE_ENUM_ELEM_NAMES_FCT stringifyEnumInitializerHelper
 #endif
-#define ENUM_NAME_TUPLE_DECL(x, next) StaticString<ConstString{STRINGIFY(x)}.size()> IF(next)(ADD_COMMA, EMPTY_ACTION)()
+#define STRINGIFY_ENUM(x, next) Details::STRINGIZE_ENUM_ELEM_NAMES_FCT<ConstString{STRINGIFY(x)}.size()>(STRINGIFY(x)) IF(next)(ADD_COMMA)()
+#define ENUM_NAME_TUPLE_DECL(x, next) StaticString<ConstString{STRINGIFY(x)}.size()> IF(next)(ADD_COMMA)()
 
 namespace EnumUtils
 {
@@ -142,7 +148,7 @@ class EnumIterator : public std::conditional_t<tag == EnumIteratorTag::Normal,
     public:
     using Base::Base;
     
-    constexpr EnumIterator(EnumName e) : Base{EnumName::values(), e.getIndex()}
+    constexpr EnumIterator(EnumName e) : Base{EnumName::values(), e.get_index()}
     {}
     
     constexpr EnumIterator(const EnumIterator& other) = default;
@@ -151,7 +157,7 @@ class EnumIterator : public std::conditional_t<tag == EnumIteratorTag::Normal,
     
     constexpr reference operator*() const
     {
-        return *reinterpret_cast<pointer>(Base::operator->());
+        return reinterpret_cast<reference>(Base::operator*());
     }
     
     constexpr pointer operator->() const
@@ -179,7 +185,7 @@ class EnumName                                                                  
     using TupleType = std::tuple<MAP2(ENUM_NAME_TUPLE_DECL, __VA_ARGS__)>;                                                      \
                                                                                                                                 \
     public:                                                                                                                     \
-    constexpr EnumName() noexcept : value_{values()[0]} {}                                                                        \
+    constexpr EnumName() noexcept : value_{values_[0]} {}                                                                       \
     constexpr EnumName(const EnumName& other) noexcept : value_{other.value_} {}                                                \
     constexpr EnumName(Internal##EnumName value) noexcept : value_{value} {}                                                    \
     constexpr EnumName operator=(const EnumName& other) noexcept { value_ = other.value_; return *this; }                       \
@@ -192,21 +198,21 @@ class EnumName                                                                  
     constexpr bool operator>(EnumName other) const noexcept { return value_ > other.value_; }                                   \
     constexpr bool operator<=(EnumName other) const noexcept { return !(*this > other); }                                       \
                                                                                                                                 \
-    constexpr underlyingType toUnderlying() const noexcept                                                                      \
+    constexpr underlyingType to_value() const noexcept                                                                          \
     {                                                                                                                           \
         return static_cast<underlyingType>(value_);                                                                             \
     }                                                                                                                           \
     constexpr explicit operator underlyingType() const noexcept                                                                 \
     {                                                                                                                           \
-        return toUnderlying();                                                                                                  \
+        return to_value();                                                                                                      \
     }                                                                                                                           \
     template<class T>                                                                                                           \
-    static constexpr EnumName fromValue(T val)                                                                                  \
+    static constexpr EnumName from_value(T val)                                                                                 \
     {                                                                                                                           \
         static_assert(std::is_convertible<T, underlying_type>::value,                                                           \
         "Construction from value require the value to be convertible to the underlying type");                                  \
                                                                                                                                 \
-        for(const auto value : values())                                                                                                \
+        for(const auto value : values_)                                                                                         \
         {                                                                                                                       \
             if(value == val)                                                                                                    \
             {                                                                                                                   \
@@ -216,11 +222,11 @@ class EnumName                                                                  
                                                                                                                                 \
         CONSTEXPR_ASSERT(false, "The value to build from is invalid");                                                          \
     }                                                                                                                           \
-	static constexpr bool isContiguous() noexcept 																				\
+	static constexpr bool is_contiguous() noexcept 																				\
 	{ 																															\
-		if(values().size() == 0) return true; 																					\
-		underlyingType last = values()[0];																						\
-		for(auto it = values().cbegin() + 1; it != values().cend(); ++it, ++last)												\
+		if(values_.size() == 0) return true; 																					\
+		underlyingType last = values_[0];																						\
+		for(auto it = values_.cbegin() + 1; it != values_.cend(); ++it, ++last)												    \
 		{																														\
 			if(*it != last + 1) return false;																					\
 		}																														\
@@ -236,7 +242,7 @@ class EnumName                                                                  
     class IterableHelper                                                                                                        \
     {                                                                                                                           \
         public:                                                                                                                 \
-        constexpr IterableHelper() : value_{values()[0]}{}                                                                      \
+        constexpr IterableHelper() : value_{values_[0]}{}                                                                       \
         constexpr IterableHelper(Internal##EnumName value) : value_{value}{}                                                    \
                                                                                                                                 \
                                                                                                                                 \
@@ -260,51 +266,44 @@ class EnumName                                                                  
     };                                                                                                                          \
                                                                                                                                 \
     public:                                                                                                                     \
-    static constexpr IterableHelper iterable() noexcept{ return {}; }                                                           \
-    static constexpr IterableHelper iterableFrom(Internal##EnumName value) noexcept{ return {value}; }                          \
+    static constexpr IterableHelper iter() noexcept{ return {}; }                                                               \
+    static constexpr IterableHelper iter_from(Internal##EnumName value) noexcept{ return {value}; }                             \
                                                                                                                                 \
-    constexpr size_t getIndex() const noexcept                                                                                  \
+    constexpr size_t get_index() const noexcept                                                                                 \
     {                                                                                                                           \
         for(size_t i = 0; i < size_; ++i)                                                                                       \
         {                                                                                                                       \
-            if(values()[i] == value_) return i;                                                                                 \
+            if(values_[i] == value_) return i;                                                                                  \
         }                                                                                                                       \
         return size_; /* Or error ? */                                                                                          \
-    }                                                                                                                           \
-                                                                                                                                \
-    static constexpr ConstString getEnumName() noexcept                                                                         \
-    {                                                                                                                           \
-        return enumName;                                                                                                        \
     }                                                                                                                           \
                                                                                                                                 \
     private: 	                                                                                                                \
     Internal##EnumName value_;                                                                                                  \
                                                                                                                                 \
     static constexpr size_t size_ = std::tuple_size<TupleType>::value;                                                          \
-	static constexpr const ConstString enumName() noexcept																		\
+	static constexpr const ConstString enum_name() noexcept																		\
 	{																															\
-   		constexpr ConstString enumName_ = #EnumName;                                                                     		\
-		return enumName_;																										\
+   		return #EnumName;                                                                     		                            \
 	}																															\
                                                                                                                                 \
     public:                                                                                                                     \
     using ValuesArrayType = std::array<Internal##EnumName, size_>;                                                              \
-	static constexpr const ValuesArrayType values() noexcept 				  													\
-	{ 																															\
-    	constexpr ValuesArrayType values{{MAP2(ENUM_ASSIGN_REMOVE(EnumName), __VA_ARGS__)}};                             		\
-		return values;																											\
-	}																															\
+                                                                                                                                \
+    static constexpr const ValuesArrayType& values() noexcept { return values_; }                                               \
+                                                                                                                                \
+    private:                                                                                                                    \
+    static constexpr ValuesArrayType values_{{MAP2(ENUM_ASSIGN_REMOVE(EnumName), __VA_ARGS__)}};                                \
 };                                                                                                                              \
 
 /* Declarations like :
  * IMPROVED_ENUM(MyEnum, size_t, Hello = 5);
- * will produce names like "Hello ", with a space at the end. Should trim the name strings ?
- * Or is it miscallenaous and do not matter ?
+ * will produce names like "Hello ".
  */
 
 #define IMPROVED_ENUM(EnumName, underlyingType, ...)                                                                            \
-namespace { using EnumName##TupleType = std::tuple<MAP2(ENUM_NAME_TUPLE_DECL, __VA_ARGS__)>;                                                      \
-static constexpr EnumName##TupleType EnumName##names_{MAP2(STRINGIFY_ENUM, __VA_ARGS__)};}                                                   		\
+namespace { using EnumName##TupleType = std::tuple<MAP2(ENUM_NAME_TUPLE_DECL, __VA_ARGS__)>;                                    \
+static constexpr EnumName##TupleType EnumName##names_{MAP2(STRINGIFY_ENUM, __VA_ARGS__)};}                                      \
 static_assert(std::is_integral<underlyingType>::value,                                                                          \
     "The defined underlying type is not an integral type");                                                                     \
 class EnumName                                                                                                                  \
@@ -320,7 +319,7 @@ class EnumName                                                                  
     using UnderlyingEnumType = Internal##EnumName;                                                                              \
                                                                                                                                 \
     public:                                                                                                                     \
-    constexpr EnumName() noexcept : value_{values()[0]} {}                                                                      \
+    constexpr EnumName() noexcept : value_{values_[0]} {}                                                                       \
     constexpr EnumName(const EnumName& other) noexcept : value_{other.value_} {}                                                \
     constexpr EnumName(Internal##EnumName value) noexcept : value_{value} {}                                                    \
     constexpr EnumName operator=(const EnumName& other) noexcept { value_ = other.value_; return *this; }                       \
@@ -333,23 +332,23 @@ class EnumName                                                                  
     constexpr bool operator>(EnumName other) const noexcept { return value_ > other.value_; }                                   \
     constexpr bool operator<=(EnumName other) const noexcept { return !(*this > other); }                                       \
                                                                                                                                 \
-    constexpr underlyingType toUnderlying() const noexcept                                                                      \
+    constexpr underlyingType to_value() const noexcept                                                                          \
     {                                                                                                                           \
         return static_cast<underlyingType>(value_);                                                                             \
     }                                                                                                                           \
     constexpr explicit operator underlyingType() const noexcept                                                                 \
     {                                                                                                                           \
-        return toUnderlying();                                                                                                  \
+        return to_value();                                                                                                      \
     }                                                                                                                           \
     template<class T>                                                                                                           \
-    static constexpr EnumName fromValue(T val)                                                                                  \
+    static constexpr EnumName from_value(T val) noexcept                                                                        \
     {                                                                                                                           \
         static_assert(std::is_convertible<T, underlying_type>::value,                                                           \
         "Construction from value require the value to be convertible to the underlying type");                                  \
                                                                                                                                 \
-        for(const auto value : values())                                                                                        \
+        for(const auto value : values_)                                                                                         \
         {                                                                                                                       \
-            if(value == val)                                                                                                    \
+            if(value == static_cast<Internal##EnumName>(val))                                                                   \
             {                                                                                                                   \
                 return {static_cast<Internal##EnumName>(val)};                                                                  \
             }                                                                                                                   \
@@ -358,11 +357,11 @@ class EnumName                                                                  
         CONSTEXPR_ASSERT(false, "The value to build from is invalid");                                                          \
     }                                                                                                                           \
                                                                                                                                 \
-	static constexpr bool isContiguous() noexcept		 																		\
+	static constexpr bool is_contiguous() noexcept		 																		\
 	{ 																															\
-		if(values().size() == 0) return true; 																					\
-		underlyingType last = values()[0];																						\
-		for(auto it = values().cbegin() + 1; it != values().cend(); ++it, ++last)												\
+		if(values_.size() == 0) return true; 																					\
+		underlyingType last = values_[0];																						\
+		for(auto it = values_.cbegin() + 1; it != values_.cend(); ++it, ++last)												    \
 		{																														\
 			if(*it != last + 1) return false;																					\
 		}																														\
@@ -378,7 +377,7 @@ class EnumName                                                                  
     class IterableHelper                                                                                                        \
     {                                                                                                                           \
         public:                                                                                                                 \
-        constexpr IterableHelper() : value_{values()[0]}{}                                                                      \
+        constexpr IterableHelper() : value_{values_[0]}{}                                                                       \
         constexpr IterableHelper(Internal##EnumName value) : value_{value}{}                                                    \
                                                                                                                                 \
                                                                                                                                 \
@@ -402,68 +401,63 @@ class EnumName                                                                  
     };                                                                                                                          \
                                                                                                                                 \
     public:                                                                                                                     \
-    static constexpr IterableHelper iterable() noexcept{ return {}; }                                                           \
-    static constexpr IterableHelper iterableFrom(Internal##EnumName value) noexcept{ return {value}; }                          \
+    static constexpr IterableHelper iter() noexcept{ return {}; }                                                               \
+    static constexpr IterableHelper iter_from(Internal##EnumName value) noexcept{ return {value}; }                             \
                                                                                                                                 \
-    constexpr size_t getIndex() const noexcept                                                                                  \
+    constexpr size_t get_index() const noexcept                                                                                 \
     {                                                                                                                           \
         for(size_t i = 0; i < size_; ++i)                                                                                       \
         {                                                                                                                       \
-            if(values()[i] == value_) return i;                                                                                 \
+            if(values_[i] == value_) return i;                                                                                  \
         }                                                                                                                       \
         return size_; /* Or error ? */                                                                                          \
     }                                                                                                                           \
                                                                                                                                 \
-                                                                                                                     \
+                                                                                                                                \
                                                                                                                                 \
     public:                                                                                                                     \
-    constexpr ConstString toString() const;                                                                                     \
-    static constexpr ConstString getEnumName() noexcept                                                                         \
+    constexpr ConstString to_string() const;                                                                                    \
+    static constexpr ConstString get_enum_name() noexcept                                                                       \
     {                                                                                                                           \
-        return enumName();                                                                                                      \
+        return #EnumName;                                                                     		                            \
     }                                                                                                                           \
                                                                                                                                 \
     private:                                                                                                                    \
     Internal##EnumName value_;                                                                                                  \
-                                                                                                                                \
-    static constexpr size_t size_ = std::tuple_size<EnumName##TupleType>::value;                                                          \
-																														\
-	static constexpr const ConstString enumName() noexcept																		\
-	{																															\
-   		constexpr ConstString enumName_ = #EnumName;                                                                     		\
-		return enumName_;																										\
-	}																															\
-																																\
+    static constexpr size_t size_ = std::tuple_size<EnumName##TupleType>::value;                                                \
+																														        \
     template<size_t index>                                                                                                      \
     struct Looper                                                                                                               \
     {                                                                                                                           \
-        static constexpr ConstString toStringImpl(EnumName e)                                                                   \
+        static constexpr ConstString to_string_impl(const EnumName e)                                                           \
         {                                                                                                                       \
             static_assert(index < e.size_, "Out of range !");                                                                   \
-            return e.values()[index] == e.value_ ? ConstString{std::get<index>(EnumName##names_)} : Looper<index + 1>::toStringImpl(e);\
+                                                                                                                                \
+            return e.values_[index] == e.value_ ?                                                                               \
+            ConstString{std::get<index>(EnumName##names_)}                                                                      \
+            : Looper<index + 1>::to_string_impl(e);                                                                             \
         }                                                                                                                       \
-    };    	\ 
+    };    	                                                                                                                    \
                                                                                                                                 \
     public:                                                                                                                     \
     using ValuesArrayType = std::array<Internal##EnumName, size_>;                                                              \
-	static constexpr const ValuesArrayType values() noexcept		 															\
-	{ 																															\
-    	constexpr ValuesArrayType values_{{MAP2(ENUM_ASSIGN_REMOVE(EnumName), __VA_ARGS__)}};                             		\
-		return values_;																											\
-	}																															\
+    static constexpr const ValuesArrayType& values() noexcept { return values_; }\
+\
+    private:\
+    static constexpr ValuesArrayType values_{{MAP2(ENUM_ASSIGN_REMOVE(EnumName), __VA_ARGS__)}};                             	\
 };                                                                                                                              \
                                                                                                                                 \
 template<>                                                                                                                      \
 struct EnumName::Looper<EnumName::size_>                                                                                        \
 {                                                                                                                               \
-    static constexpr ConstString toStringImpl(EnumName)                                                                         \
+    static constexpr ConstString to_string_impl(EnumName)                                                                       \
     {                                                                                                                           \
         return "";                                                                                                              \
     }                                                                                                                           \
 };                                                                                                                              \
-constexpr ConstString EnumName::toString() const                                                                                \
+constexpr ConstString EnumName::to_string() const                                                                               \
 {                                                                                                                               \
-    return Looper<0>::toStringImpl(*this);                                                                                      \
+    return Looper<0>::to_string_impl(*this);                                                                                    \
 }                                                                                                                               \
                                                                
 #endif // ENUM_UTILS_HXX

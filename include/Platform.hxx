@@ -23,9 +23,9 @@
 #if defined( __STDC__ ) && !defined( __cplusplus )
 #   error "This project require a C++ compiler !"
 #endif
-#if defined( __cplusplus ) && ( __cplusplus == 199711L )
-#   error "This project require a C++11 compliant compiler in order to build properly!\
-             If your compiler support C++11, please turn C++11 support option on !"
+#if defined( __cplusplus ) && ( __cplusplus < 201703L )
+#   error "This project require a C++17 compliant compiler in order to build properly!\
+             If your compiler support C++17, please turn C++17 support option on !"
 #endif
 
 #if defined( __clang__ ) || defined( __llvm__ )

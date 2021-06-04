@@ -95,7 +95,7 @@ using improvedEnumTestList =
 template<class EnumName>
 struct enumFixture
 {
-	std::remove_const_t<decltype(EnumName::values)> values;
+	std::decay_t<decltype(EnumName::values())> values;
 };
 
 template<class EnumName>
@@ -103,183 +103,183 @@ auto IterableEnumTestCode()
 {
 	return [](auto &_) {
 		_.setup([](enumFixture<EnumName>& fixture) {
-			std::copy(std::begin(EnumName::values), std::end(EnumName::values), std::begin(fixture.values));
+			std::copy(std::begin(EnumName::values()), std::end(EnumName::values()), std::begin(fixture.values));
 		});
 		
 		_.test("Iteration test", [](enumFixture<EnumName>& fixture) {
 			size_t i = 0;
-			for(auto value : EnumName::iterable())
+			for(auto value : EnumName::iter())
 			{
-				expect(value.toUnderlying(), equal_to(fixture.values[i]));
+				expect(value.to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 	
 		_.test("Index of first element", [](enumFixture<EnumName>&) {
 			EnumName tst = EnumName::Test1;
-			expect(tst.getIndex(), equal_to(0));	  
+			expect(tst.get_index(), equal_to(0));	  
 		});
 		
 		_.test("Index of second element", [](enumFixture<EnumName>&) {
 			EnumName tst = EnumName::Test2;
-			expect(tst.getIndex(), equal_to(1));	  
+			expect(tst.get_index(), equal_to(1));	  
 		});
 		
 		_.test("Index of third element", [](enumFixture<EnumName>&) {
 			EnumName tst = EnumName::Test3;
-			expect(tst.getIndex(), equal_to(2));	  
+			expect(tst.get_index(), equal_to(2));	  
 		});
 		
 		_.test("Index of fourth element", [](enumFixture<EnumName>&) {
 			EnumName tst = EnumName::Test4;
-			expect(tst.getIndex(), equal_to(3));	  
+			expect(tst.get_index(), equal_to(3));	  
 		});
 		
 		_.test("Index of fifth element", [](enumFixture<EnumName>&) {
 			EnumName tst = EnumName::Test4;
-			expect(tst.getIndex(), equal_to(3));	  
+			expect(tst.get_index(), equal_to(3));	  
 		});
 		
 		_.test("Iteration from first element with 'from()' method", [](enumFixture<EnumName>& fixture) {
 			size_t i = 0;
-			for(auto it = EnumName::iterable().from(EnumName::Test1); it != EnumName::iterable().end(); ++it)
+			for(auto it = EnumName::iter().from(EnumName::Test1); it != EnumName::iter().end(); ++it)
 			{
-				expect(it->toUnderlying(), equal_to(fixture.values[i]));
+				expect(it->to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 		
 		_.test("Iteration from second element with 'from()' method", [](enumFixture<EnumName>& fixture) {
 			size_t i = 1;
-			for(auto it = EnumName::iterable().from(EnumName::Test2); it != EnumName::iterable().end(); ++it)
+			for(auto it = EnumName::iter().from(EnumName::Test2); it != EnumName::iter().end(); ++it)
 			{
-				expect(it->toUnderlying(), equal_to(fixture.values[i]));
+				expect(it->to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 		
 		_.test("Iteration from third element with 'from()' method", [](enumFixture<EnumName>& fixture) {
 			size_t i = 2;
-			for(auto it = EnumName::iterable().from(EnumName::Test3); it != EnumName::iterable().end(); ++it)
+			for(auto it = EnumName::iter().from(EnumName::Test3); it != EnumName::iter().end(); ++it)
 			{
-				expect(it->toUnderlying(), equal_to(fixture.values[i]));
+				expect(it->to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 		
 		_.test("Iteration from fourth element with 'from()' method", [](enumFixture<EnumName>& fixture) {
 			size_t i = 3;
-			for(auto it = EnumName::iterable().from(EnumName::Test4); it != EnumName::iterable().end(); ++it)
+			for(auto it = EnumName::iter().from(EnumName::Test4); it != EnumName::iter().end(); ++it)
 			{
-				expect(it->toUnderlying(), equal_to(fixture.values[i]));
+				expect(it->to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 		
 		_.test("Iteration from fifth element with 'from()' method", [](enumFixture<EnumName>& fixture) {
 			size_t i = 4;
-			for(auto it = EnumName::iterable().from(EnumName::Test5); it != EnumName::iterable().end(); ++it)
+			for(auto it = EnumName::iter().from(EnumName::Test5); it != EnumName::iter().end(); ++it)
 			{
-				expect(it->toUnderlying(), equal_to(fixture.values[i]));
+				expect(it->to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 		
 		_.test("Iteration from first element with iterator", [](enumFixture<EnumName>& fixture) {
 			size_t i = 0;
-			for(auto it = typename EnumName::iterator(EnumName::Test1); it != EnumName::iterable().end(); ++it)
+			for(auto it = typename EnumName::iterator(EnumName::Test1); it != EnumName::iter().end(); ++it)
 			{
-				expect(it->toUnderlying(), equal_to(fixture.values[i]));
+				expect(it->to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 		
 		_.test("Iteration from second element with iterator", [](enumFixture<EnumName>& fixture) {
 			size_t i = 1;
-			for(auto it = typename EnumName::iterator(EnumName::Test2); it != EnumName::iterable().end(); ++it)
+			for(auto it = typename EnumName::iterator(EnumName::Test2); it != EnumName::iter().end(); ++it)
 			{
-				expect(it->toUnderlying(), equal_to(fixture.values[i]));
+				expect(it->to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 		
 		_.test("Iteration from third element with iterator", [](enumFixture<EnumName>& fixture) {
 			size_t i = 2;
-			for(auto it = typename EnumName::iterator(EnumName::Test3); it != EnumName::iterable().end(); ++it)
+			for(auto it = typename EnumName::iterator(EnumName::Test3); it != EnumName::iter().end(); ++it)
 			{
-				expect(it->toUnderlying(), equal_to(fixture.values[i]));
+				expect(it->to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 		
 		_.test("Iteration from fourth element with iterator", [](enumFixture<EnumName>& fixture) {
 			size_t i = 3;
-			for(auto it = typename EnumName::iterator(EnumName::Test4); it != EnumName::iterable().end(); ++it)
+			for(auto it = typename EnumName::iterator(EnumName::Test4); it != EnumName::iter().end(); ++it)
 			{
-				expect(it->toUnderlying(), equal_to(fixture.values[i]));
+				expect(it->to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 		
 		_.test("Iteration from fifth element with iterator", [](enumFixture<EnumName>& fixture) {
 			size_t i = 4;
-			for(auto it = typename EnumName::iterator(EnumName::Test5); it != EnumName::iterable().end(); ++it)
+			for(auto it = typename EnumName::iterator(EnumName::Test5); it != EnumName::iter().end(); ++it)
 			{
-				expect(it->toUnderlying(), equal_to(fixture.values[i]));
+				expect(it->to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 		
 		_.test("Reverse iteration", [](enumFixture<EnumName>& fixture) {
 			size_t i = EnumName::size() - 1;
-			for(auto it = EnumName::iterable().rbegin(); it != EnumName::iterable().rend(); ++it)
+			for(auto it = EnumName::iter().rbegin(); it != EnumName::iter().rend(); ++it)
 			{
-				expect(it->toUnderlying(), equal_to(fixture.values[i]));
+				expect(it->to_value(), equal_to(fixture.values[i]));
 				--i;
 			}
 		});
 		
 		_.test("Iterate from first element", [](enumFixture<EnumName>& fixture) {
 			size_t i = 0;
-			for(auto val : EnumName::iterableFrom(EnumName::Test1))
+			for(auto val : EnumName::iter_from(EnumName::Test1))
 			{
-				expect(val.toUnderlying(), equal_to(fixture.values[i]));
+				expect(val.to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 		
 		_.test("Iterate from second element", [](enumFixture<EnumName>& fixture) {
 			size_t i = 1;
-			for(auto val : EnumName::iterableFrom(EnumName::Test2))
+			for(auto val : EnumName::iter_from(EnumName::Test2))
 			{
-				expect(val.toUnderlying(), equal_to(fixture.values[i]));
+				expect(val.to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 		
 		_.test("Iterate from third element", [](enumFixture<EnumName>& fixture) {
 			size_t i = 2;
-			for(auto val : EnumName::iterableFrom(EnumName::Test3))
+			for(auto val : EnumName::iter_from(EnumName::Test3))
 			{
-				expect(val.toUnderlying(), equal_to(fixture.values[i]));
+				expect(val.to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 		
 		_.test("Iterate from fourth element", [](enumFixture<EnumName>& fixture) {
 			size_t i = 3;
-			for(auto val : EnumName::iterableFrom(EnumName::Test4))
+			for(auto val : EnumName::iter_from(EnumName::Test4))
 			{
-				expect(val.toUnderlying(), equal_to(fixture.values[i]));
+				expect(val.to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
 		
 		_.test("Iterate from fifth element", [](enumFixture<EnumName>& fixture) {
 			size_t i = 4;
-			for(auto val : EnumName::iterableFrom(EnumName::Test5))
+			for(auto val : EnumName::iter_from(EnumName::Test5))
 			{
-				expect(val.toUnderlying(), equal_to(fixture.values[i]));
+				expect(val.to_value(), equal_to(fixture.values[i]));
 				++i;
 			}
 		});
@@ -291,68 +291,68 @@ auto improvedEnumTestCode()
 {
 	return [](auto& _){
 		_.setup([](enumFixture<EnumName>& fixture) {
-			std::copy(std::begin(EnumName::values), std::end(EnumName::values), std::begin(fixture.values));
+			std::copy(std::begin(EnumName::values()), std::end(EnumName::values()), std::begin(fixture.values));
 		});
 		
 		_.test("Conversion of each enum value to string", [](enumFixture<EnumName>&){
 			size_t i = 1;
-			for(auto value : EnumName::iterable())
+			for(auto value : EnumName::iter())
 			{
-				expect(value.toString(), equal_to(std::string{"Test"} + std::to_string(i)));
+				expect(value.to_string(), equal_to(std::string{"Test"} + std::to_string(i)));
 				++i;
 			}
 		});
 		
 		_.test("Iteration 2 by 2 retrieve string value", [](enumFixture<EnumName>&){
 			size_t i = 1;
-			for(auto it = EnumName::iterable().begin(); it < EnumName::iterable().end(); it += 2)
+			for(auto it = EnumName::iter().begin(); it < EnumName::iter().end(); it += 2)
 			{
-				expect(it->toString(), equal_to(std::string{"Test"} + std::to_string(i)));
+				expect(it->to_string(), equal_to(std::string{"Test"} + std::to_string(i)));
 				i += 2;
 			}
 		});
 		
 		_.test("Iterate from first element", [](enumFixture<EnumName>&) {
 			size_t i = 0;
-			for(auto val : EnumName::iterableFrom(EnumName::Test1))
+			for(auto val : EnumName::iter_from(EnumName::Test1))
 			{
-				expect(val.toString(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
+				expect(val.to_string(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
 				++i;
 			}
 		});
 		
 		_.test("Iterate from second element", [](enumFixture<EnumName>&) {
 			size_t i = 1;
-			for(auto val : EnumName::iterableFrom(EnumName::Test2))
+			for(auto val : EnumName::iter_from(EnumName::Test2))
 			{
-				expect(val.toString(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
+				expect(val.to_string(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
 				++i;
 			}
 		});
 		
 		_.test("Iterate from third element", [](enumFixture<EnumName>&) {
 			size_t i = 2;
-			for(auto val : EnumName::iterableFrom(EnumName::Test3))
+			for(auto val : EnumName::iter_from(EnumName::Test3))
 			{
-				expect(val.toString(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
+				expect(val.to_string(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
 				++i;
 			}
 		});
 		
 		_.test("Iterate from fourth element", [](enumFixture<EnumName>&) {
 			size_t i = 3;
-			for(auto val : EnumName::iterableFrom(EnumName::Test4))
+			for(auto val : EnumName::iter_from(EnumName::Test4))
 			{
-				expect(val.toString(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
+				expect(val.to_string(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
 				++i;
 			}
 		});
 		
 		_.test("Iterate from fifth element", [](enumFixture<EnumName>&) {
 			size_t i = 4;
-			for(auto val : EnumName::iterableFrom(EnumName::Test5))
+			for(auto val : EnumName::iter_from(EnumName::Test5))
 			{
-				expect(val.toString(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
+				expect(val.to_string(), equal_to(std::string{"Test"} + std::to_string(i + 1)));
 				++i;
 			}
 		});
